@@ -50,8 +50,7 @@ class ExercisesSpec extends FreeSpec with Matchers {
 
     "permutations" - {
       "should generate permutations" in {
-        permutations("abb") should have length 3
-        permutations("abb") should contain allOf("abb", "bab", "bba")
+        permutations("abb") should (have length 3 and contain allOf("abb", "bab", "bba"))
       }
     }
 
