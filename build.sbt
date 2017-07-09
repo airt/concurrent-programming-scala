@@ -8,7 +8,8 @@ lazy val root = (project in file(".")).
     name := "learning-concurrent-programming",
     libraryDependencies ++= Seq(
       "commons-io" % "commons-io" % "2.5",
-      "ch.qos.logback" % "logback-classic" % "1.2.+" % Test,
-      "org.scalatest" %% "scalatest" % "3.0.+" % Test
+      "com.typesafe.scala-logging" %% "scala-logging" % "3.7.1",
+      "ch.qos.logback" % "logback-classic" % "1.2.3",
+      "org.scalatest" %% "scalatest" % "3.0.3" % Test
     )
   )
