@@ -140,7 +140,7 @@ object Exercises extends LazyLogging {
       case _ => task()
     }
 
-    synchronizedAll(adjust)((target :: senders.toList) sortBy (_.id))
+    synchronizedAll(() => adjust())((target :: senders.toList) sortBy (_.id))
   }
 
   class SyncVar[T] {
