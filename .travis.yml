@@ -6,6 +6,15 @@ scala:
 jdk:
   - oraclejdk8
 
+cache:
+  directories:
+    - $HOME/.ivy2/cache
+    - $HOME/.sbt
+
+before_cache:
+  - find $HOME/.ivy2 -name "ivydata-*.properties" | xargs rm
+  - find $HOME/.sbt  -name "*.lock"               | xargs rm
+
 script:
   - sbt ++$TRAVIS_SCALA_VERSION clean coverage test
 
