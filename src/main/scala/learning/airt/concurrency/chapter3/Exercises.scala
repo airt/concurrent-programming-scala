@@ -28,27 +28,70 @@ object Exercises extends LazyLogging {
     }
   }
 
-  class TreiberStack[T] {
-    private val vsr = new AtomicReference[List[T]](Nil)
+  class TreiberStack[A] {
+    private val vsr = new AtomicReference[List[A]](Nil)
 
-    def push(v: T) {
+    def push(v: A) {
       val ovs = vsr.get()
       val nvs = v :: ovs
       if (!vsr.compareAndSet(ovs, nvs)) push(v)
     }
 
-    def pop(): T = {
+    def pop(): A = {
       val ovs@(v :: nvs) = vsr.get()
       if (!vsr.compareAndSet(ovs, nvs)) pop()
       else v
     }
   }
 
-  class LazyCell[T](initialization: => T) {
-    @volatile private[this] var initialized = false
-    private[this] var value: T = _
+  class ConcurrentSortedList[A](implicit val ord: Ordering[A]) {
+    def add(v: A) {
+      addTo(rr, v)
+    }
 
-    def apply(): T = {
+    @tailrec
+    private def addTo(vsr: ListAtomicRef[A], v: A) {
+      vsr.get() match {
+        case vs@CCons(h, t) =>
+          if (ord.lteq(v, h)) {
+            if (!vsr.compareAndSet(vs, CCons(v, newListAtomicRef(vs)))) addTo(vsr, v)
+          } else {
+            addTo(t, v)
+          }
+        case vs@CNil =>
+          if (!vsr.compareAndSet(vs, CCons(v, newListAtomicRef(vs)))) addTo(vsr, v)
+      }
+    }
+
+    def iterator: Iterator[A] = new Iterator[A] {
+      private var current = rr.get()
+
+      override def hasNext: Boolean = current != CNil
+
+      override def next(): A = current match {
+        case CCons(h, t) => current = t.get(); h
+        case CNil => Iterator.empty.next()
+      }
+    }
+
+    private val rr = newListAtomicRef(CNil)
+
+    private type ListAtomicRef[E] = AtomicReference[CList[E]]
+
+    private trait CList[+E]
+
+    private case object CNil extends CList[Nothing]
+
+    private case class CCons[E](h: E, t: ListAtomicRef[E]) extends CList[E]
+
+    private def newListAtomicRef(vs: CList[A]) = new AtomicReference[CList[A]](vs)
+  }
+
+  class LazyCell[A](initialization: => A) {
+    @volatile private[this] var initialized = false
+    private[this] var value: A = _
+
+    def apply(): A = {
       if (!initialized) {
         this synchronized {
           if (!initialized) {
@@ -62,16 +105,16 @@ object Exercises extends LazyLogging {
   }
 
   object LazyCell {
-    def apply[T](initialization: => T): LazyCell[T] = new LazyCell(initialization)
+    def apply[A](initialization: => A): LazyCell[A] = new LazyCell(initialization)
   }
 
-  class PureLazyCell[T](initialization: => T) {
-    private[this] val vor = new AtomicReference[Option[T]](None)
+  class PureLazyCell[A](initialization: => A) {
+    private[this] val vor = new AtomicReference[Option[A]](None)
 
-    def apply(): T = apply(initialization)
+    def apply(): A = apply(initialization)
 
     @tailrec
-    private def apply(vc: => T): T = vor.get() match {
+    private def apply(vc: => A): A = vor.get() match {
       case Some(v) => v
       case None =>
         val v = vc
@@ -81,7 +124,7 @@ object Exercises extends LazyLogging {
   }
 
   object PureLazyCell {
-    def apply[T](initialization: => T): PureLazyCell[T] = new PureLazyCell(initialization)
+    def apply[A](initialization: => A): PureLazyCell[A] = new PureLazyCell(initialization)
   }
 
   class SyncConcurrentMap[A, B]
@@ -125,7 +168,7 @@ object Exercises extends LazyLogging {
     override def empty[A, B]: SyncConcurrentMap[A, B] = new SyncConcurrentMap[A, B]
   }
 
-  def spawn[T](block: => T): Try[T] = {
+  def spawn[A](block: => A): Try[A] = {
     import java.io._
     val actionFile = File.createTempFile(s"spawn-action-${System.currentTimeMillis()}", ".tmp")
     val resultFile = File.createTempFile(s"spawn-result-${System.currentTimeMillis()}", ".tmp")
@@ -141,7 +184,8 @@ object Exercises extends LazyLogging {
     val classPaths = {
       val dependenciesClassPath = "target/streams/test/dependencyClasspath/$global/streams/export"
       val dependencies = io.Source.fromFile(dependenciesClassPath).getLines().toSeq
-      val sources = Seq("target/scala-2.12/classes", "target/scala-2.12/test-classes")
+      val scv = util.Properties.versionNumberString.split("\\.").take(2).mkString(".")
+      val sources = Seq(s"target/scala-$scv/classes", s"target/scala-$scv/test-classes")
       dependencies ++ sources
     }
     val command = Seq(
@@ -157,7 +201,7 @@ object Exercises extends LazyLogging {
     Try(command.!!) flatMap { output =>
       logger.debug(s"spawn output: [\n$output\n]")
       managed(new ObjectInputStream(new FileInputStream(resultFile))).
-        map(_.readObject().asInstanceOf[Try[T]]).
+        map(_.readObject().asInstanceOf[Try[A]]).
         tried.flatten
     }
   }

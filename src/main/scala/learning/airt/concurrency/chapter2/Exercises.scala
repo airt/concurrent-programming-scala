@@ -143,21 +143,21 @@ object Exercises extends LazyLogging {
     synchronizedAll(() => adjust())((target :: senders.toList) sortBy (_.id))
   }
 
-  class SyncVar[T] {
-    private var variable: Option[T] = None
+  class SyncVar[A] {
+    private var variable: Option[A] = None
 
     def isEmpty: Boolean = synchronized(variable.isEmpty)
 
     def nonEmpty: Boolean = synchronized(variable.nonEmpty)
 
-    def get(): T = synchronized {
+    def get(): A = synchronized {
       variable match {
         case Some(v) => variable = None; v
         case None => throw new NoSuchElementException("get from empty variable")
       }
     }
 
-    def put(v: T): this.type = synchronized {
+    def put(v: A): this.type = synchronized {
       variable match {
         case Some(_) => throw new IllegalStateException("put to nonempty variable")
         case None => variable = Some(v); this
@@ -165,7 +165,7 @@ object Exercises extends LazyLogging {
     }
 
     // noinspection AccessorLikeMethodIsEmptyParen
-    def getWait(): T = synchronized {
+    def getWait(): A = synchronized {
       while (variable.isEmpty) wait()
       val Some(v) = variable
       variable = None
@@ -173,7 +173,7 @@ object Exercises extends LazyLogging {
       v
     }
 
-    def putWait(v: T): this.type = synchronized {
+    def putWait(v: A): this.type = synchronized {
       while (variable.nonEmpty) wait()
       variable = Some(v)
       notify()
@@ -181,18 +181,18 @@ object Exercises extends LazyLogging {
     }
   }
 
-  class SyncQueue[T](n: Int) {
-    private val variables = mutable.Queue[T]()
+  class SyncQueue[A](n: Int) {
+    private val variables = mutable.Queue[A]()
 
     // noinspection AccessorLikeMethodIsEmptyParen
-    def getWait(): T = synchronized {
+    def getWait(): A = synchronized {
       while (variables.isEmpty) wait()
       val v = variables.dequeue()
       notify()
       v
     }
 
-    def putWait(v: T): this.type = synchronized {
+    def putWait(v: A): this.type = synchronized {
       while (variables.size == n) wait()
       variables += v
       notify()

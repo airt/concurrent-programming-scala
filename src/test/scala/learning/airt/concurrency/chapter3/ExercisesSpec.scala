@@ -61,6 +61,23 @@ class ExercisesSpec extends FreeSpec with Matchers with Inspectors with LazyLogg
       }
     }
 
+    "ConcurrentSortedList" - {
+      "should work correctly" in {
+        val list = new ConcurrentSortedList[Int]
+        Random shuffle (1 to 100) foreach { i =>
+          executes {
+            list add i
+          }
+        }
+        Thread.sleep(10)
+        val rs = list.iterator.toSeq
+        rs shouldEqual (1 to 100)
+        a[NoSuchElementException] should be thrownBy {
+          new ConcurrentSortedList[Int].iterator.next()
+        }
+      }
+    }
+
     "LazyCell" - {
       "should initialize after get" in {
         val initialized = new AtomicBoolean(false)

@@ -10,7 +10,7 @@ object Exercises {
       y <- ym
     } yield (x, y)
 
-  def check[T](xs: Seq[T])(p: T => Boolean): Boolean = xs forall p
+  def check[A](xs: Seq[A])(p: A => Boolean): Boolean = xs forall p
 
   case class Pair[A, B](first: A, second: B)
 
