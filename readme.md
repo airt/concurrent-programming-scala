@@ -3,7 +3,7 @@
 [![Build Status][build-badge]][build-status]
 [![Test Coverage][coverage-badge]][coverage-result]
 
-Practices of the book Learning Concurrent Programming in Scala
+Practices for [Learning Concurrent Programming in Scala](https://concurrent-programming-in-scala.github.io/)
 
 ## license
 
