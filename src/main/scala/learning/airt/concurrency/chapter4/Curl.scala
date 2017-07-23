@@ -9,11 +9,13 @@ object Curl {
   import ExecutionContext.Implicits.global
 
   def main(args: Array[String]) {
-    apply(args.head)
+    apply(args(0), args contains "--silent")
   }
 
-  def apply(url: String): Future[String] = {
-    val dotPrinter = DotPrinter.start(500)
+  def apply(url: String, silent: Boolean = false): Future[String] = {
+    val print: Any => Unit = if (silent) _ => () else Predef.print
+
+    val dotPrinter = DotPrinter.start(500, print)
 
     val res = Future {
       io.Source.fromURL(url).mkString
@@ -21,10 +23,14 @@ object Curl {
 
     res onComplete (_ => dotPrinter.stop())
 
+    res foreach print
+
+    res.failed foreach { e => print(s"Exception: $e\n") }
+
     res
   }
 
-  class DotPrinter(period: Long) {
+  class DotPrinter(period: Long, print: Any => Unit) {
     private val timer = new Timer
 
     timer.schedule(new TimerTask {
@@ -32,14 +38,14 @@ object Curl {
     }, 0, period)
 
     def stop() {
-      println()
+      print("\n")
       timer.cancel()
       timer.purge()
     }
   }
 
   object DotPrinter {
-    def start(period: Long): DotPrinter = new DotPrinter(period)
+    def start(period: Long, print: Any => Unit): DotPrinter = new DotPrinter(period, print)
   }
 
 }

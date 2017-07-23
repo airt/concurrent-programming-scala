@@ -29,9 +29,10 @@ class PriorityTaskPoolSpec extends FreeSpec with Matchers {
         pool.shutdown()
         Thread.sleep(100)
 
-        executedTasks.size should be < tasksQuantity
-        val executedTasksPriority = executedTasks filter (_.id > workersQuantity * 2) map (_.priority)
-        all(executedTasksPriority) should be >= importantPriority
+        val executedTasksPriorities =
+          executedTasks filter (_.id > workersQuantity * 2) map (_.priority)
+
+        all(executedTasksPriorities) should be >= importantPriority
       }
     }
 

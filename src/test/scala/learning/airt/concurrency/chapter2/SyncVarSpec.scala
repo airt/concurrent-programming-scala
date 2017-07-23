@@ -1,5 +1,7 @@
 package learning.airt.concurrency.chapter2
 
+import java.util.concurrent.atomic.AtomicInteger
+
 import org.scalatest._
 
 class SyncVarSpec extends FreeSpec with Matchers {
@@ -39,34 +41,30 @@ class SyncVarSpec extends FreeSpec with Matchers {
       "getWait" - {
         "should work correctly" in {
           val sv = new SyncVar[Int]
-          val startTime = System.currentTimeMillis()
-          @volatile var delta = 0
-          thread {
+          val step = new AtomicInteger(0)
+          val t = thread {
             val v = sv.getWait()
             v shouldBe 1
-            delta = (System.currentTimeMillis() - startTime).toInt
+            step.incrementAndGet() shouldBe 2
           }
-          Thread.sleep(100)
+          step.incrementAndGet() shouldBe 1
           sv.putWait(1)
-          Thread.sleep(10)
-          delta should be >= 100
+          t.join()
         }
       }
 
       "putWait" - {
         "should work correctly" in {
           val sv = new SyncVar[Int]
-          val startTime = System.currentTimeMillis()
-          @volatile var delta = 0
-          thread {
+          val step = new AtomicInteger(0)
+          val t = thread {
             sv.putWait(1).putWait(2)
-            delta = (System.currentTimeMillis() - startTime).toInt
+            step.incrementAndGet() shouldBe 2
           }
-          Thread.sleep(100)
+          step.incrementAndGet() shouldBe 1
           val v = sv.getWait()
           v shouldBe 1
-          Thread.sleep(10)
-          delta should be >= 100
+          t.join()
         }
       }
 

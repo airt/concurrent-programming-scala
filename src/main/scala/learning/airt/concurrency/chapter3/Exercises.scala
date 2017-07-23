@@ -12,9 +12,9 @@ import scala.concurrent.ExecutionContext
 import scala.util._
 import scala.util.control.NonFatal
 
-object Exercises extends LazyLogging {
+object Exercises {
 
-  class PiggybackContext extends ExecutionContext {
+  class PiggybackContext extends ExecutionContext with LazyLogging {
     override def execute(task: Runnable) {
       try {
         task.run()
@@ -167,6 +167,10 @@ object Exercises extends LazyLogging {
   object SyncConcurrentMap extends MutableMapFactory[SyncConcurrentMap] {
     override def empty[A, B]: SyncConcurrentMap[A, B] = new SyncConcurrentMap[A, B]
   }
+
+}
+
+object Spawn extends LazyLogging {
 
   def spawn[A](block: => A): Try[A] = {
     import java.io._

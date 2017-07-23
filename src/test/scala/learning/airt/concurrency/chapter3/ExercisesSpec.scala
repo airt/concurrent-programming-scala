@@ -2,13 +2,13 @@ package learning.airt.concurrency.chapter3
 
 import java.util.concurrent.atomic._
 
-import com.typesafe.scalalogging.LazyLogging
+import learning.airt.concurrency.chapter2.thread
 import org.scalatest._
 
 import scala.collection.JavaConverters._
 import scala.util._
 
-class ExercisesSpec extends FreeSpec with Matchers with Inspectors with LazyLogging {
+class ExercisesSpec extends FreeSpec with Matchers with Inspectors {
 
   import Exercises._
 
@@ -45,18 +45,16 @@ class ExercisesSpec extends FreeSpec with Matchers with Inspectors with LazyLogg
       "should work correctly" in {
         val stack = new TreiberStack[Int]
         val rs = new java.util.concurrent.LinkedBlockingQueue[Int]
-        (1 to 100) foreach { i =>
-          executes {
+        (1 to 100) map { i =>
+          thread {
             stack push i
           }
-        }
-        Thread.sleep(10)
-        (1 to 100) foreach { _ =>
-          executes {
+        } foreach (_ join())
+        (1 to 100) map { _ =>
+          thread {
             rs put stack.pop()
           }
-        }
-        Thread.sleep(10)
+        } foreach (_ join())
         rs.asScala.toSeq.sorted shouldEqual (1 to 100)
       }
     }
@@ -64,12 +62,11 @@ class ExercisesSpec extends FreeSpec with Matchers with Inspectors with LazyLogg
     "ConcurrentSortedList" - {
       "should work correctly" in {
         val list = new ConcurrentSortedList[Int]
-        Random shuffle (1 to 100) foreach { i =>
-          executes {
+        Random shuffle (1 to 100) map { i =>
+          thread {
             list add i
           }
-        }
-        Thread.sleep(10)
+        } foreach (_ join())
         val rs = list.iterator.toSeq
         rs shouldEqual (1 to 100)
         a[NoSuchElementException] should be thrownBy {
@@ -136,10 +133,8 @@ class ExercisesSpec extends FreeSpec with Matchers with Inspectors with LazyLogg
           count.incrementAndGet()
           1
         }
-        (1 to 100) foreach { _ => cell() }
-        Thread.sleep(100)
+        (1 to 100) map { _ => thread(cell()) } foreach (_ join())
         count.get() should be <= 100
-        logger.debug(s"PureLazyCell initialization count ${count.get()}")
       }
     }
 
@@ -147,23 +142,21 @@ class ExercisesSpec extends FreeSpec with Matchers with Inspectors with LazyLogg
       "putIfAbsent" - {
         "should put key value and return `None` when not exist" in {
           val m = SyncConcurrentMap[Int, Int]()
-          (1 to 100) foreach { i =>
-            executes {
+          (1 to 100) map { i =>
+            thread {
               m.putIfAbsent(i, 1) shouldBe None
             }
-          }
-          Thread.sleep(10)
+          } foreach (_ join())
           m should have size 100
           forAll(m.values)(_ shouldBe 1)
         }
         "should not put key value and return `Some(ov)` when exist" in {
           val m = SyncConcurrentMap[Int, Int]((1 to 100) map ((_, 0)): _*)
-          (1 to 100) foreach { i =>
-            executes {
+          (1 to 100) map { i =>
+            thread {
               m.putIfAbsent(i, 1) shouldBe Some(0)
             }
-          }
-          Thread.sleep(10)
+          } foreach (_ join())
           m should have size 100
           forAll(m.values)(_ shouldBe 0)
         }
@@ -171,89 +164,81 @@ class ExercisesSpec extends FreeSpec with Matchers with Inspectors with LazyLogg
       "remove" - {
         "should remove key value and return true when exist and equal" in {
           val m = SyncConcurrentMap[Int, Int]((1 to 100) map ((_, 0)): _*)
-          (1 to 100) foreach { i =>
-            executes {
+          (1 to 100) map { i =>
+            thread {
               m.remove(i, 0) shouldBe true
             }
-          }
-          Thread.sleep(10)
+          } foreach (_ join())
           m should have size 0
         }
         "should not remove key value and return false when exist but not equal" in {
           val m = SyncConcurrentMap[Int, Int]((1 to 100) map ((_, 0)): _*)
-          (1 to 100) foreach { i =>
-            executes {
+          (1 to 100) map { i =>
+            thread {
               m.remove(i, 1) shouldBe false
             }
-          }
-          Thread.sleep(10)
+          } foreach (_ join())
           m should have size 100
         }
         "should not remove key value and return false when not exist" in {
           val m = SyncConcurrentMap[Int, Int]()
-          (1 to 100) foreach { i =>
-            executes {
+          (1 to 100) map { i =>
+            thread {
               m.remove(i, 1) shouldBe false
             }
-          }
-          Thread.sleep(10)
+          } foreach (_ join())
           m should have size 0
         }
       }
       "replace" - {
         "should put value and return `Some(ov)` when exist" in {
           val m = SyncConcurrentMap[Int, Int]((1 to 100) map ((_, 0)): _*)
-          (1 to 100) foreach { i =>
-            executes {
+          (1 to 100) map { i =>
+            thread {
               m.replace(i, 1) shouldBe Some(0)
             }
-          }
-          Thread.sleep(10)
+          } foreach (_ join())
           m should have size 100
           forAll(m.values)(_ shouldBe 1)
         }
         "should not put value and return `None` when not exist" in {
           val m = SyncConcurrentMap[Int, Int]()
-          (1 to 100) foreach { i =>
-            executes {
+          (1 to 100) map { i =>
+            thread {
               m.replace(i, 1) shouldBe None
             }
-          }
-          Thread.sleep(10)
+          } foreach (_ join())
           m should have size 0
         }
       }
       "replace" - {
         "should put value and return true when exist and equal" in {
           val m = SyncConcurrentMap[Int, Int]((1 to 100) map ((_, 0)): _*)
-          (1 to 100) foreach { i =>
-            executes {
+          (1 to 100) map { i =>
+            thread {
               m.replace(i, 0, 1) shouldBe true
             }
-          }
-          Thread.sleep(10)
+          } foreach (_ join())
           m should have size 100
           forAll(m.values)(_ shouldBe 1)
         }
         "should not put value and return false when exist but not equal" in {
           val m = SyncConcurrentMap[Int, Int]((1 to 100) map ((_, 0)): _*)
-          (1 to 100) foreach { i =>
-            executes {
+          (1 to 100) map { i =>
+            thread {
               m.replace(i, 2, 1) shouldBe false
             }
-          }
-          Thread.sleep(10)
+          } foreach (_ join())
           m should have size 100
           forAll(m.values)(_ shouldBe 0)
         }
         "should not put value and return false when not exist" in {
           val m = SyncConcurrentMap[Int, Int]().empty
-          (1 to 100) foreach { i =>
-            executes {
+          (1 to 100) map { i =>
+            thread {
               m.replace(i, 2, 1) shouldBe false
             }
-          }
-          Thread.sleep(10)
+          } foreach (_ join())
           m should have size 0
         }
       }
@@ -263,7 +248,7 @@ class ExercisesSpec extends FreeSpec with Matchers with Inspectors with LazyLogg
       "should work correctly" in {
         val x = Random.nextInt()
         val y = Random.nextInt()
-        val result = spawn {
+        val result = Spawn.spawn {
           x + y
         }
         result shouldBe Success(x + y)
