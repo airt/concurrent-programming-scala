@@ -15,19 +15,19 @@ object Spawn extends LazyLogging {
     resultFile.deleteOnExit()
 
     managed(new ObjectOutputStream(new FileOutputStream(actionFile))) foreach {
-      _.writeObject(() => block)
+      _ writeObject (() => block)
     }
 
     import scala.sys.process._
     val command = Seq(
       "java", "-cp",
-      classPaths.mkString(":"),
+      classPaths mkString ":",
       SpawnExecutor.className,
       actionFile.getCanonicalPath,
       resultFile.getCanonicalPath
     )
 
-    logger.debug(s"command:\n${command.mkString(" ")}")
+    logger.debug(s"command:\n${command mkString " "}")
 
     Try(command.!!) flatMap { output =>
       logger.debug(s"spawn output: [\n$output\n]")
@@ -39,10 +39,10 @@ object Spawn extends LazyLogging {
 
   private def classPaths = {
     val dependenciesClassPath = "target/streams/test/dependencyClasspath/$global/streams/export"
-    val dependencies = io.Source.fromFile(dependenciesClassPath).getLines().toSeq
-    val scv = util.Properties.versionNumberString.split("\\.").take(2).mkString(".")
+    val dependencies = managed(io.Source fromFile dependenciesClassPath).map(_.getLines().toList).opt.get
+    val scv = util.Properties.versionNumberString split "\\." take 2 mkString "."
     val sources = Seq(s"target/scala-$scv/classes", s"target/scala-$scv/test-classes")
-    dependencies ++ sources
+    sources ++ dependencies
   }
 
 }

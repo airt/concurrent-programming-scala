@@ -2,6 +2,8 @@ package learning.airt.concurrency.chapter4
 
 import java.util.{Timer, TimerTask}
 
+import resource.managed
+
 import scala.concurrent._
 
 object Curl {
@@ -18,7 +20,7 @@ object Curl {
     val dotPrinter = DotPrinter.start(500, print)
 
     val res = Future {
-      io.Source.fromURL(url).mkString
+      managed(io.Source fromURL url).map(_.mkString).opt.get
     } withTimeout 2000
 
     res onComplete (_ => dotPrinter.stop())
