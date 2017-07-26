@@ -6,7 +6,7 @@ object TimedAllocating extends LazyLogging {
 
   def main(args: Array[String]) {
     val ns = Timer warmedTimed new AnyRef
-    logger.debug(s"the average running time of allocating a simple object is $ns nanoseconds")
+    logger debug s"the average running time of allocating a simple object is $ns nanoseconds"
   }
 
 }

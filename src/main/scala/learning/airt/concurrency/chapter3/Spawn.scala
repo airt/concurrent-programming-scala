@@ -27,10 +27,10 @@ object Spawn extends LazyLogging {
       resultFile.getCanonicalPath
     )
 
-    logger.debug(s"command:\n${command mkString " "}")
+    logger debug s"command:\n${command mkString " "}"
 
     Try(command.!!) flatMap { output =>
-      logger.debug(s"spawn output: [\n$output\n]")
+      logger debug s"spawn output: [\n$output\n]"
       managed(new ObjectInputStream(new FileInputStream(resultFile))).
         map(_.readObject().asInstanceOf[Try[A]]).
         tried.flatten

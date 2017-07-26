@@ -14,7 +14,7 @@ object ProducerAndConsumer extends LazyLogging {
           v = sv.get()
         } else Thread.`yield`()
       }
-      logger.debug(s"consumer task completed")
+      logger debug s"consumer task completed"
     }
 
     val producer = thread {
@@ -25,7 +25,7 @@ object ProducerAndConsumer extends LazyLogging {
           v += 1
         } else Thread.`yield`()
       }
-      logger.debug(s"producer task completed")
+      logger debug s"producer task completed"
     }
 
     producer.join()
@@ -40,7 +40,7 @@ object ProducerAndConsumer extends LazyLogging {
       while (v != 15) {
         v = sv.getWait()
       }
-      logger.debug(s"consumer task with wait completed")
+      logger debug s"consumer task with wait completed"
     }
 
     val producer = thread {
@@ -49,7 +49,7 @@ object ProducerAndConsumer extends LazyLogging {
         sv.putWait(v)
         v += 1
       }
-      logger.debug(s"producer task with wait completed")
+      logger debug s"producer task with wait completed"
     }
 
     producer.join()
@@ -64,7 +64,7 @@ object ProducerAndConsumer extends LazyLogging {
       while (v != 15) {
         v = sq.getWait()
       }
-      logger.debug(s"consumer task with queue completed")
+      logger debug s"consumer task with queue completed"
     }
 
     val producer = thread {
@@ -73,7 +73,7 @@ object ProducerAndConsumer extends LazyLogging {
         sq.putWait(v)
         v += 1
       }
-      logger.debug(s"producer task with queue completed")
+      logger debug s"producer task with queue completed"
     }
 
     producer.join()

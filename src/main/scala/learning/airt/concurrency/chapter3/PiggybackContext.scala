@@ -14,7 +14,7 @@ class PiggybackContext extends ExecutionContext with LazyLogging {
   }
 
   override def reportFailure(cause: Throwable) {
-    logger.warn(s"piggyback task exception: ${cause.getMessage}")
+    logger warn s"piggyback task exception: ${cause.getMessage}"
   }
 
 }
