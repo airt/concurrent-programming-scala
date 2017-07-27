@@ -12,8 +12,8 @@ class BinomialHeapSpec extends FreeSpec with Matchers {
 
       "apply" - {
         "should work correctly" in {
-          val heap = BinomialHeap(Random shuffle (1 to 15): _*)
-          heap.toList shouldBe (1 to 15)
+          val heap = BinomialHeap from (Random shuffle (1 to 15))
+          heap.toSeq shouldBe (1 to 15)
         }
       }
 
@@ -21,41 +21,51 @@ class BinomialHeapSpec extends FreeSpec with Matchers {
         "should work correctly" in {
           val heap = BinomialHeap(1, 5)
           val heapN = heap insert 3
-          heapN.toList shouldBe List(1, 3, 5)
+          heapN.toSeq shouldBe Seq(1, 3, 5)
         }
       }
 
       "remove" - {
         "should work correctly" in {
-          val heap = BinomialHeap(Random shuffle (1 to 15): _*)
-          val (value, newHeap) = heap.remove
+          val heap = BinomialHeap from (Random shuffle (1 to 15))
+          val (value, heapN) = heap.remove
           value shouldBe 1
-          newHeap.toList shouldBe (2 to 15)
+          heapN.toSeq shouldBe (2 to 15)
         }
       }
 
       "minimum" - {
         "should work correctly" in {
-          val heap = BinomialHeap(Random shuffle (1 to 15): _*)
+          val heap = BinomialHeap from (Random shuffle (1 to 15))
           heap.minimum shouldBe 1
         }
       }
 
       "merge" - {
         "should work correctly" in {
-          val heapA = BinomialHeap(Random shuffle (1 to 15 by 2).toVector: _*)
-          val heapB = BinomialHeap(Random shuffle (2 to 15 by 2).toVector: _*)
+          // noinspection RedundantCollectionConversion
+          val heapB = BinomialHeap from (Random shuffle (2 to 15 by 2).toIndexedSeq)
+          // noinspection RedundantCollectionConversion
+          val heapA = BinomialHeap from (Random shuffle (1 to 15 by 2).toIndexedSeq)
           heapA.size shouldBe 8
           heapB.size shouldBe 7
           val heapN = heapA merge heapB
           heapN.size shouldBe 15
-          heapN.toList shouldBe (1 to 15)
+          heapN.toSeq shouldBe (1 to 15)
+        }
+      }
+
+      "size" - {
+        "should work correctly" in {
+          val heap = BinomialHeap from (Random shuffle (1 to 15))
+          heap.size shouldBe 15
+          heap.iterator.size shouldBe 15
         }
       }
 
       "show" - {
         "should work correctly" in {
-          val heap = BinomialHeap(1 to 15: _*)
+          val heap = BinomialHeap from (1 to 15)
           heap.show shouldBe
             """
               |BinomialHeap {
@@ -116,9 +126,12 @@ class BinomialHeapSpec extends FreeSpec with Matchers {
 
       "size" - {
         "should work correctly" in {
+          def strictSize[A](tree: BinomialTree[A]): Int =
+            1 + (tree.children map strictSize).sum
+
           trees.zipWithIndex take 10 foreach { case (tree, index) =>
             tree.order shouldBe index
-            tree.size shouldBe tree.strictSize
+            tree.size shouldBe strictSize(tree)
           }
         }
       }

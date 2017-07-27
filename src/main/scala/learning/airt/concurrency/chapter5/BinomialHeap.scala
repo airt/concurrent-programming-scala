@@ -5,24 +5,22 @@ import learning.airt.concurrency.chapter5.BinomialTree.BinomialTrees
 /**
   * @param trees ascending on value
   */
-class BinomialHeap[A: Ordering] private(
-  val trees: BinomialTrees[A] = Nil
-) extends Iterable[A] {
+class BinomialHeap[A: Ordering] private(val trees: BinomialTrees[A]) extends Iterable[A] {
 
   def insert(value: A): BinomialHeap[A] =
     this merge new BinomialHeap((BinomialTree zero value) :: Nil)
 
   def remove: (A, BinomialHeap[A]) = {
-    val minTree = trees.minBy(_.value)
-    val tmpHeap = new BinomialHeap(minTree.children.reverse)
-    val newHeap = new BinomialHeap(this.trees filter (_ != minTree)) merge tmpHeap
-    (minTree.value, newHeap)
+    import BinomialHeap.ListOps
+    val (tree, treesR) = trees removeMinBy (_.value)
+    val heapN = new BinomialHeap(treesR) merge new BinomialHeap(tree.children.reverse)
+    (tree.value, heapN)
   }
 
-  def minimum: A = trees.map(_.value).min
+  def minimum: A = (trees map (_.value)).min
 
   def merge(rhs: BinomialHeap[A]): BinomialHeap[A] =
-    new BinomialHeap((mergeTrees compose mergeAscending) (trees, rhs.trees))
+    new BinomialHeap((mergeTrees compose mergeAscending) ((trees, rhs.trees)))
 
   private lazy val mergeAscending: ((BinomialTrees[A], BinomialTrees[A])) => BinomialTrees[A] = {
     case (Nil, ys) => ys
@@ -49,7 +47,7 @@ class BinomialHeap[A: Ordering] private(
 
   override def size: Int = (trees map (_.size)).sum
 
-  override def isEmpty: Boolean = trees == Nil
+  override def isEmpty: Boolean = trees.isEmpty
 
   override def iterator: Iterator[A] = new BinomialHeapIterator(this)
 
@@ -65,7 +63,7 @@ class BinomialHeap[A: Ordering] private(
 
   def show: String = showLines mkString "\n"
 
-  private def showLines: Seq[String] =
+  def showLines: Seq[String] =
     "BinomialHeap {" +: (trees map (_.showLines) reduce (_ ++ Seq(",") ++ _)) :+ "}"
 
 }
@@ -74,15 +72,32 @@ object BinomialHeap {
 
   def apply[A: Ordering](xs: A*): BinomialHeap[A] = (empty[A] /: xs) (_ insert _)
 
-  def empty[A: Ordering] = new BinomialHeap[A]
+  def empty[A: Ordering] = new BinomialHeap[A](Nil)
+
+  def from[A: Ordering](xs: Seq[A]): BinomialHeap[A] = apply[A](xs: _*)
+
+  private implicit class ListOps[A](private val xs: List[A]) extends AnyVal {
+    def removeMinBy[B](f: A => B)(implicit ord: Ordering[B]): (A, List[A]) = {
+      if (xs.isEmpty) throw new UnsupportedOperationException("empty.removeMinBy")
+      val (_, m, rs) =
+        (xs.tail :\ (f(xs.head), xs.head, Nil: List[A])) { (x, z) =>
+          val (fm, m, rs) = z
+          val fx = f(x)
+          if (ord.lt(fx, fm)) {
+            (fx, x, m :: rs)
+          } else {
+            (fm, m, x :: rs)
+          }
+        }
+      (m, rs)
+    }
+  }
 
 }
 
-case class BinomialTree[A] private(value: A, order: Int, children: List[BinomialTree[A]]) {
+case class BinomialTree[A] private(value: A, children: List[BinomialTree[A]]) {
 
-  require(order == children.size)
-
-  def strictSize: Int = 1 + children.map(_.strictSize).sum
+  lazy val order: Int = children.size
 
   /**
     * 2 ^order^
@@ -93,10 +108,8 @@ case class BinomialTree[A] private(value: A, order: Int, children: List[Binomial
 
   def /::(lhs: BinomialTree[A]): BinomialTree[A] = {
     require(lhs.order == order)
-    BinomialTree(value, 1 + order, lhs :: children)
+    BinomialTree(value, lhs :: children)
   }
-
-  override def toString: String = show
 
   def show: String = showLines mkString "\n"
 
@@ -109,7 +122,7 @@ object BinomialTree {
 
   type BinomialTrees[A] = List[BinomialTree[A]]
 
-  def zero[A](value: A) = BinomialTree(value, 0, Nil)
+  def zero[A](value: A) = BinomialTree(value, Nil)
 
   def repeat[A](value: A): Stream[BinomialTree[A]] = {
     lazy val trees: Stream[BinomialTree[A]] =
