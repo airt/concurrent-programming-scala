@@ -11,7 +11,7 @@ class ParBinomialHeap[A: Ordering](heap: BinomialHeap[A])
 
   override def size: Int = heap.size
 
-  override def stringPrefix: String = "ParBinomialHeap"
+  override def newCombiner = new ParBinomialHeapCombiner[A]
 
 }
 
@@ -33,5 +33,30 @@ class ParBinomialHeapSplitter[A: Ordering](heap: BinomialHeap[A])
 
   private def fromTree(tree: BinomialTree[A]) =
     new ParBinomialHeapSplitter(new BinomialHeap(tree :: Nil))
+
+}
+
+class ParBinomialHeapCombiner[A: Ordering] extends Combiner[A, ParBinomialHeap[A]] {
+
+  private var heap = BinomialHeap.empty[A]
+
+  override def combine[N <: A, NewTo >: ParBinomialHeap[A]](
+    other: Combiner[N, NewTo]
+  ): Combiner[N, NewTo] = other match {
+    case that if that eq this => this
+    case that: ParBinomialHeapCombiner[A] => heap = heap merge that.heap; this
+    case _ => throw new IllegalArgumentException
+  }
+
+  override def +=(value: A): this.type = {
+    heap = heap insert value
+    this
+  }
+
+  override def size: Int = heap.size
+
+  override def clear(): Unit = heap = BinomialHeap.empty[A]
+
+  override def result(): ParBinomialHeap[A] = heap.par
 
 }
