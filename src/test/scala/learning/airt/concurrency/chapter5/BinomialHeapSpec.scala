@@ -124,6 +124,14 @@ class BinomialHeapSpec extends FreeSpec with Matchers {
         }
       }
 
+      "split" - {
+        "should work correctly" in {
+          val Some((treeA, treeB)) = trees(3).split
+          treeA shouldBe trees(2)
+          treeB shouldBe trees(2)
+        }
+      }
+
       "size" - {
         "should work correctly" in {
           def strictSize[A](tree: BinomialTree[A]): Int =
