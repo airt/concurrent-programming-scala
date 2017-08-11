@@ -14,14 +14,17 @@ class SyncQueueSpec extends FreeSpec with Matchers {
         "should work correctly" in {
           val sq = new SyncQueue[Int](2)
           val step = new AtomicInteger(0)
-          val t = thread {
-            val v = sq.getWait()
+          val t1 = thread {
+            val v = sq getWait()
             v shouldBe 1
-            step.incrementAndGet() shouldBe 2
+            step incrementAndGet() shouldBe 2
           }
-          step.incrementAndGet() shouldBe 1
-          sq.putWait(1)
-          t.join()
+          val t2 = thread {
+            step incrementAndGet() shouldBe 1
+            sq putWait 1
+          }
+          t1 join()
+          t2 join()
         }
       }
 
@@ -29,14 +32,17 @@ class SyncQueueSpec extends FreeSpec with Matchers {
         "should work correctly" in {
           val sq = new SyncQueue[Int](2)
           val step = new AtomicInteger(0)
-          val t = thread {
-            sq.putWait(1).putWait(2).putWait(3)
-            step.incrementAndGet() shouldBe 2
+          val t1 = thread {
+            sq putWait 1 putWait 2 putWait 3
+            step incrementAndGet() shouldBe 2
           }
-          step.incrementAndGet() shouldBe 1
-          val v = sq.getWait()
-          v shouldBe 1
-          t.join()
+          val t2 = thread {
+            step incrementAndGet() shouldBe 1
+            val v = sq getWait()
+            v shouldBe 1
+          }
+          t1 join()
+          t2 join()
         }
       }
 
