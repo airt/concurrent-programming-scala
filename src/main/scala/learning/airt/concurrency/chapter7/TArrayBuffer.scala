@@ -30,7 +30,7 @@ class TArrayBuffer[A](initialSize: Int = 8)
   override def length: Int = alr.single()
 
   override def +=(v: A): this.type = atomic { implicit txn =>
-    alr() += 1
+    alr() = alr() + 1
     ensureSize(alr())
     val array = ar()
     array(alr() - 1) = v.asInstanceOf[AnyRef]
@@ -38,7 +38,7 @@ class TArrayBuffer[A](initialSize: Int = 8)
   }
 
   override def +=:(v: A): this.type = atomic { implicit txn =>
-    alr() += 1
+    alr() = alr() + 1
     ensureSize(alr())
     shiftRight(0, 1, alr())
     val array = ar()
@@ -48,7 +48,7 @@ class TArrayBuffer[A](initialSize: Int = 8)
 
   override def insertAll(n: Int, vs: Traversable[A]): Unit = atomic { implicit txn =>
     withCheckedIndex(n) {
-      alr() += vs.size
+      alr() = alr() + vs.size
       ensureSize(alr())
       shiftRight(n, vs.size, alr() - n)
       val array = ar()
@@ -62,7 +62,7 @@ class TArrayBuffer[A](initialSize: Int = 8)
 
   override def remove(n: Int): A = atomic { implicit txn =>
     withCheckedIndex(n) {
-      alr() -= 1
+      alr() = alr() - 1
       val array = ar()
       val v = array(n)
       shiftLeft(n + 1, 1, alr() - n)
