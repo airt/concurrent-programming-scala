@@ -12,6 +12,9 @@ class TArrayBufferSpec extends FreeSpec with Matchers {
         "should work correctly" in {
           val buffer = TArrayBuffer(1 to 16: _*)
           buffer.toList shouldBe (1 to 16)
+          a[NoSuchElementException] should be thrownBy {
+            buffer.iterator drop 16 next()
+          }
         }
       }
 
@@ -20,6 +23,12 @@ class TArrayBufferSpec extends FreeSpec with Matchers {
           val buffer = TArrayBuffer(1 to 16: _*)
           buffer(1) shouldBe 2
           buffer(15) shouldBe 16
+        }
+        "should throw exception when exists out-of-bounds access" in {
+          val buffer = TArrayBuffer(1 to 16: _*)
+          an[IndexOutOfBoundsException] should be thrownBy {
+            buffer(16)
+          }
         }
       }
 
@@ -62,14 +71,13 @@ class TArrayBufferSpec extends FreeSpec with Matchers {
       "insertAll" - {
         "should work correctly" in {
           val buffer = TArrayBuffer(1 to 16: _*)
-          buffer insertAll(9, Seq(21, 22, 23))
-          buffer.length shouldBe 19
-          buffer(8) shouldBe 9
-          buffer(9) shouldBe 21
-          buffer(10) shouldBe 22
-          buffer(11) shouldBe 23
-          buffer(12) shouldBe 10
-          buffer(18) shouldBe 16
+          buffer insertAll(10, 21 to 37)
+          buffer.length shouldBe 33
+          buffer(9) shouldBe 10
+          buffer(10) shouldBe 21
+          buffer(26) shouldBe 37
+          buffer(27) shouldBe 11
+          buffer(32) shouldBe 16
         }
       }
 
@@ -89,6 +97,13 @@ class TArrayBufferSpec extends FreeSpec with Matchers {
           val buffer = TArrayBuffer(1 to 16: _*)
           buffer clear()
           buffer.length shouldBe 0
+        }
+      }
+
+      "toString" - {
+        "should work correctly" in {
+          val buffer = TArrayBuffer(1, 2, 3)
+          buffer.toString shouldBe "TArrayBuffer(1, 2, 3)"
         }
       }
 

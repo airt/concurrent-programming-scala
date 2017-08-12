@@ -10,70 +10,70 @@ class TArrayBuffer[A](initialSize: Int = 8)
     with GenericTraversableTemplate[A, TArrayBuffer]
     with mutable.Builder[A, TArrayBuffer[A]] {
 
-  private val ar = Ref[TArray[AnyRef]](TArray ofDim[AnyRef] initialSize)
-  private val alr = Ref(0)
+  private val arrayRef = Ref[TArray[AnyRef]](TArray ofDim[AnyRef] initialSize)
+  private val lengthRef = Ref(0)
 
   override def apply(n: Int): A = atomic { implicit txn =>
-    withCheckedIndex(n) {
-      val array = ar()
+    withIndexChecked(n) {
+      val array = arrayRef()
       array(n).asInstanceOf[A]
     }
   }
 
   override def update(n: Int, v: A): Unit = atomic { implicit txn =>
-    withCheckedIndex(n) {
-      val array = ar()
+    withIndexChecked(n) {
+      val array = arrayRef()
       array(n) = v.asInstanceOf[AnyRef]
     }
   }
 
-  override def length: Int = alr.single()
+  override def length: Int = lengthRef.single()
 
   override def +=(v: A): this.type = atomic { implicit txn =>
-    alr() = alr() + 1
-    ensureSize(alr())
-    val array = ar()
-    array(alr() - 1) = v.asInstanceOf[AnyRef]
+    ensureSize(lengthRef() + 1)
+    val array = arrayRef()
+    array(lengthRef()) = v.asInstanceOf[AnyRef]
+    lengthRef() = lengthRef() + 1
     this
   }
 
   override def +=:(v: A): this.type = atomic { implicit txn =>
-    alr() = alr() + 1
-    ensureSize(alr())
-    shiftRight(0, 1, alr())
-    val array = ar()
+    ensureSize(lengthRef() + 1)
+    shiftRight(0, 1, lengthRef() + 1)
+    val array = arrayRef()
     array(0) = v.asInstanceOf[AnyRef]
+    lengthRef() = lengthRef() + 1
     this
   }
 
   override def insertAll(n: Int, vs: Traversable[A]): Unit = atomic { implicit txn =>
-    withCheckedIndex(n) {
-      alr() = alr() + vs.size
-      ensureSize(alr())
-      shiftRight(n, vs.size, alr() - n)
-      val array = ar()
+    withIndexChecked(n) {
+      ensureSize(lengthRef() + vs.size)
+      shiftRight(n, vs.size, lengthRef() - n)
+      val array = arrayRef()
       var i = 0
       for (v <- vs) {
         array(n + i) = v.asInstanceOf[AnyRef]
         i += 1
       }
+      lengthRef() = lengthRef() + vs.size
     }
   }
 
   override def remove(n: Int): A = atomic { implicit txn =>
-    withCheckedIndex(n) {
-      alr() = alr() - 1
-      val array = ar()
+    withIndexChecked(n) {
+      val array = arrayRef()
       val v = array(n)
-      shiftLeft(n + 1, 1, alr() - n)
-      array(alr()) = null
+      shiftLeft(n + 1, 1, lengthRef() - 1 - n)
+      array(lengthRef() - 1) = null
+      lengthRef() = lengthRef() - 1
       v.asInstanceOf[A]
     }
   }
 
   override def clear(): Unit = atomic { implicit txn =>
-    ar() = TArray ofDim[AnyRef] initialSize
-    alr() = 0
+    arrayRef() = TArray ofDim[AnyRef] initialSize
+    lengthRef() = 0
   }
 
   override def iterator: Iterator[A] = new TArrayBuffer.TArrayBufferIterator(this)
@@ -85,36 +85,36 @@ class TArrayBuffer[A](initialSize: Int = 8)
   override def result(): TArrayBuffer[A] = this
 
   override def sizeHint(size: Int): Unit = atomic { implicit txn =>
-    if (size > length) {
-      val oldArray = ar()
+    if (arrayRef().length < size) {
+      val oldArray = arrayRef()
       val newArray: TArray[AnyRef] = TArray ofDim[AnyRef] size
       for (i <- 0 until oldArray.length) newArray(i) = oldArray(i)
-      ar() = newArray
+      arrayRef() = newArray
     }
   }
 
   protected def ensureSize(size: Int)(implicit txn: InTxn) {
-    if (ar().length < size) {
-      var newSize = ar().length * 2L
+    if (arrayRef().length < size) {
+      var newSize = arrayRef().length * 2L
       while (newSize < size) newSize *= 2L
       if (newSize > Int.MaxValue) newSize = Int.MaxValue
       sizeHint(newSize.toInt)
     }
   }
 
-  protected def withCheckedIndex[B](n: Int)(action: => B)(implicit txn: InTxn): B = {
-    if (n < 0 || n >= alr()) throw new IndexOutOfBoundsException(n.toString) else {
+  protected def withIndexChecked[B](n: Int)(action: => B)(implicit txn: InTxn): B = {
+    if (n < 0 || n >= lengthRef()) throw new IndexOutOfBoundsException(n.toString) else {
       action
     }
   }
 
   protected def shiftLeft(index: Int, distance: Int, length: Int)(implicit txn: InTxn) {
-    val array = ar()
+    val array = arrayRef()
     for (i <- 0 until length) array(index + i - distance) = array(index + i)
   }
 
   protected def shiftRight(index: Int, distance: Int, length: Int)(implicit txn: InTxn) {
-    val array = ar()
+    val array = arrayRef()
     for (i <- (length - 1) to 0 by (-1)) array(index + i + distance) = array(index + i)
   }
 
