@@ -23,7 +23,7 @@ class RollbackCounterSpec extends FreeSpec with Matchers with LazyLogging {
             xr() = x + 1
             x
           }
-          val rsa = Future sequence ((1 to 20) map (_ => Future {
+          val rsa = Future sequence ((1 to 10) map (_ => Future {
             blocking {
               atomicRollbackCount(f)._2
             }
