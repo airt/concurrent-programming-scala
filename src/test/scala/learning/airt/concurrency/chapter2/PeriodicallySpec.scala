@@ -15,7 +15,7 @@ class PeriodicallySpec extends FreeSpec with Matchers {
         periodically(1.millisecond) {
           i += 1
         }
-        Thread.sleep(10)
+        Thread sleep 10
         i should be > 0
       }
     }

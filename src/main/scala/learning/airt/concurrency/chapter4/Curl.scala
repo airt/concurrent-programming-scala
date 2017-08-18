@@ -15,39 +15,48 @@ object Curl {
   }
 
   def apply(url: String, silent: Boolean = false): Future[String] = {
+
     val print: Any => Unit = if (silent) _ => () else Predef.print
 
-    val dotPrinter = DotPrinter.start(500, print)
+    val dotPrinter = DotPrinter start (500, print)
 
     val res = Future {
-      managed(io.Source fromURL url).map(_.mkString).opt.get
+      (managed(io.Source fromURL url) map (_.mkString)).opt.get
     } withTimeout 2000
 
-    res onComplete (_ => dotPrinter.stop())
+    res onComplete (_ => dotPrinter stop ())
 
     res foreach print
 
-    res.failed foreach { e => print(s"Exception: $e\n") }
+    res.failed foreach { e =>
+      print(s"Exception: $e\n")
+    }
 
     res
   }
 
   class DotPrinter(period: Long, print: Any => Unit) {
+
     private val timer = new Timer
 
-    timer.schedule(new TimerTask {
+    private val task = new TimerTask {
       override def run(): Unit = print(".")
-    }, 0, period)
+    }
+
+    timer schedule (task, 0, period)
 
     def stop() {
       print("\n")
-      timer.cancel()
-      timer.purge()
+      timer cancel ()
+      timer purge ()
     }
+
   }
 
   object DotPrinter {
+
     def start(period: Long, print: Any => Unit): DotPrinter = new DotPrinter(period, print)
+
   }
 
 }

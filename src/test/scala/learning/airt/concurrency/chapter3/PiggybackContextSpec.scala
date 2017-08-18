@@ -9,17 +9,17 @@ class PiggybackContextSpec extends FreeSpec with Matchers {
     "PiggybackContext" - {
       "should run task in current thread" in {
         val context = new PiggybackContext
-        val currentThreadName = Thread.currentThread().getName
+        val currentThreadName = Thread.currentThread.getName
         context execute { () =>
-          Thread.currentThread().getName shouldBe currentThreadName
+          Thread.currentThread.getName shouldBe currentThreadName
         }
       }
       "could run `execute` inside task" in {
         val context = new PiggybackContext
-        val currentThreadName = Thread.currentThread().getName
+        val currentThreadName = Thread.currentThread.getName
         context execute { () =>
           context execute { () =>
-            Thread.currentThread().getName shouldBe currentThreadName
+            Thread.currentThread.getName shouldBe currentThreadName
           }
         }
       }

@@ -13,7 +13,7 @@ class RMap[A, B] {
     case None =>
   }
 
-  def apply(k: A): Observable[B] = internal getOrElseUpdate(k, Subject())
+  def apply(k: A): Observable[B] = internal getOrElseUpdate (k, Subject())
 
 }
 

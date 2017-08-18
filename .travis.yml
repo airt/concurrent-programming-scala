@@ -17,6 +17,7 @@ before_cache:
 
 script:
   - sbt ++$TRAVIS_SCALA_VERSION clean coverage test
+  - sbt ++$TRAVIS_SCALA_VERSION scalafmt::test test:scalafmt::test sbt:scalafmt::test
 
 after_success:
   - sbt ++$TRAVIS_SCALA_VERSION coverageReport coveralls

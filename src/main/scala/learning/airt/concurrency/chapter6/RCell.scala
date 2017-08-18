@@ -2,7 +2,7 @@ package learning.airt.concurrency.chapter6
 
 import rx.lang.scala.Subject
 
-class RCell[A] protected(override val ob: Subject[A]) extends Signal[A](ob) {
+class RCell[A] protected (override val ob: Subject[A]) extends Signal[A](ob) {
 
   def :=(v: A) {
     ob onNext v

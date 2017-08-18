@@ -8,7 +8,7 @@ class SpawnSpec extends AsyncFreeSpec with Matchers {
 
     "Spawn" - {
       "should work correctly" in {
-        Spawn.spawn("ls -lh") map { exitCode =>
+        Spawn spawn "ls -lh /" map { exitCode =>
           exitCode shouldBe 0
         }
       }

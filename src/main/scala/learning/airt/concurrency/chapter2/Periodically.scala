@@ -9,12 +9,12 @@ object Periodically {
       override def run() {
         while (true) {
           task
-          Thread.sleep(duration.toMillis)
+          Thread sleep duration.toMillis
         }
       }
     }
-    worker.setDaemon(true)
-    worker.start()
+    worker setDaemon true
+    worker start ()
     worker
   }
 

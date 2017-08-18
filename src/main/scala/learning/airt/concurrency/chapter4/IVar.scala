@@ -7,11 +7,11 @@ class IVar[A] {
   private val promise = Promise[A]
 
   def apply(): A =
-    if (promise.isCompleted) Await.result(promise.future, duration.Duration.Inf)
+    if (promise.isCompleted) Await result (promise.future, duration.Duration.Inf)
     else throw new NoSuchElementException
 
   def :=(x: A) {
-    if (!promise.trySuccess(x)) throw new IllegalStateException
+    if (!(promise trySuccess x)) throw new IllegalStateException
   }
 
 }

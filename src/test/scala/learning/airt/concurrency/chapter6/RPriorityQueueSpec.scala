@@ -15,13 +15,15 @@ class RPriorityQueueSpec extends FreeSpec with Matchers {
           val queue = RPriorityQueue[Int]()
           val ob = queue.popped
           val counter = new AtomicInteger(0)
-          ob subscribe { x => x shouldBe counter.incrementAndGet() }
+          ob subscribe { x =>
+            x shouldBe (counter incrementAndGet ())
+          }
           queue add 2
           queue add 1
-          queue pop()
-          queue pop()
+          queue pop ()
+          queue pop ()
           Thread sleep 10
-          counter get() shouldBe 2
+          counter get () shouldBe 2
         }
       }
 

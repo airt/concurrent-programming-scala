@@ -12,7 +12,7 @@ class RPriorityQueue[A: Ordering] {
   def add(v: A): Unit = queue += v
 
   def pop(): A = {
-    val v = queue.dequeue()
+    val v = queue dequeue ()
     subject onNext v
     v
   }

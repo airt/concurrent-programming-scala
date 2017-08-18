@@ -5,8 +5,7 @@ import learning.airt.concurrency.chapter5.BinomialHeap.BinomialTrees
 /**
   * @param trees should be ascending by `tree.value`
   */
-class BinomialHeap[A: Ordering](val trees: BinomialTrees[A])
-  extends collection.immutable.Iterable[A] {
+class BinomialHeap[A: Ordering](val trees: BinomialTrees[A]) extends collection.immutable.Iterable[A] {
 
   def insert(value: A): BinomialHeap[A] =
     this merge new BinomialHeap((BinomialTree zero value) :: Nil)
@@ -44,7 +43,7 @@ object BinomialHeap {
 
   type BinomialTrees[A] = List[BinomialTree[A]]
 
-  def apply[A: Ordering](xs: A*): BinomialHeap[A] = (empty[A] /: xs) (_ insert _)
+  def apply[A: Ordering](xs: A*): BinomialHeap[A] = (empty[A] /: xs)(_ insert _)
 
   def empty[A: Ordering] = new BinomialHeap[A](Nil)
 
@@ -58,7 +57,7 @@ object BinomialHeap {
         (xs.tail :\ (f(xs.head), xs.head, Nil: List[A])) { (x, z) =>
           val (fm, m, rs) = z
           val fx = f(x)
-          if (ord.lt(fx, fm))
+          if (ord lt (fx, fm))
             (fx, x, m :: rs)
           else
             (fm, m, x :: rs)
@@ -106,7 +105,7 @@ object BinomialHeap {
 
 }
 
-case class BinomialTree[A] private(value: A, children: List[BinomialTree[A]]) {
+case class BinomialTree[A] private (value: A, children: List[BinomialTree[A]]) {
 
   lazy val order: Int = children.size
 
@@ -118,7 +117,7 @@ case class BinomialTree[A] private(value: A, children: List[BinomialTree[A]]) {
   }
 
   def merge(rhs: BinomialTree[A])(implicit ord: Ordering[A]): BinomialTree[A] =
-    if (ord.lteq(value, rhs.value)) rhs /:: this
+    if (ord lteq (value, rhs.value)) rhs /:: this
     else this /:: rhs
 
   def split: Option[(BinomialTree[A], BinomialTree[A])] =

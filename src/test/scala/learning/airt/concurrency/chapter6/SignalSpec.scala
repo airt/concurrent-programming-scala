@@ -50,7 +50,7 @@ class SignalSpec extends FreeSpec with Matchers {
           val subject = Subject[Int]
           val signalA = Signal from subject
           subject onNext 1
-          val signal = (signalA scan 0) (_ + _)
+          val signal = (signalA scan 0)(_ + _)
           signal() shouldBe 0
           subject onNext 2
           signal() shouldBe 2

@@ -8,7 +8,7 @@ package object chapter2 {
         body
       }
     }
-    t.start()
+    t start ()
     t
   }
 

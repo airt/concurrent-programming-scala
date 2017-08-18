@@ -13,23 +13,23 @@ class SyncVarSpec extends FreeSpec with Matchers {
       "get" - {
         "should return value" in {
           val sv = new SyncVar[Int]
-          sv put 1 get() shouldBe 1
+          sv put 1 get () shouldBe 1
         }
         "should throw exception when empty" in {
           val sv = new SyncVar[Int]
-          a[NoSuchElementException] should be thrownBy (sv get())
+          a[NoSuchElementException] should be thrownBy (sv get ())
         }
         "should become empty after `get`" in {
           val sv = new SyncVar[Int]
-          sv put 1 get()
-          a[NoSuchElementException] should be thrownBy (sv get())
+          sv put 1 get ()
+          a[NoSuchElementException] should be thrownBy (sv get ())
         }
       }
 
       "put" - {
         "should hold value" in {
           val sv = new SyncVar[Int]
-          sv put 1 get() shouldBe 1
+          sv put 1 get () shouldBe 1
         }
         "should throw exception when nonempty" in {
           val sv = new SyncVar[Int]
@@ -43,16 +43,16 @@ class SyncVarSpec extends FreeSpec with Matchers {
           val sv = new SyncVar[Int]
           val step = new AtomicInteger(0)
           val t1 = thread {
-            val v = sv getWait()
+            val v = sv getWait ()
             v shouldBe 1
-            step incrementAndGet() shouldBe 2
+            step incrementAndGet () shouldBe 2
           }
           val t2 = thread {
-            step incrementAndGet() shouldBe 1
+            step incrementAndGet () shouldBe 1
             sv putWait 1
           }
-          t1 join()
-          t2 join()
+          t1 join ()
+          t2 join ()
         }
       }
 
@@ -62,15 +62,15 @@ class SyncVarSpec extends FreeSpec with Matchers {
           val step = new AtomicInteger(0)
           val t1 = thread {
             sv putWait 1 putWait 2
-            step incrementAndGet() shouldBe 2
+            step incrementAndGet () shouldBe 2
           }
           val t2 = thread {
-            step incrementAndGet() shouldBe 1
-            val v = sv getWait()
+            step incrementAndGet () shouldBe 1
+            val v = sv getWait ()
             v shouldBe 1
           }
-          t1 join()
-          t2 join()
+          t1 join ()
+          t2 join ()
         }
       }
 
@@ -88,7 +88,7 @@ class SyncVarSpec extends FreeSpec with Matchers {
         }
         "should be empty after `get`" in {
           val sv = new SyncVar[Int]
-          sv put 1 get()
+          sv put 1 get ()
           sv.isEmpty shouldBe true
           sv.nonEmpty shouldBe false
         }

@@ -13,7 +13,7 @@ class ParBinomialHeapSpec extends FreeSpec with Matchers {
       "splitter" - {
         "should work correctly" in {
           val heap = BinomialHeap from (Random shuffle (1 to 15))
-          (heap.par fold 0) (_ + _) shouldBe (1 to 15).sum
+          (heap.par fold 0)(_ + _) shouldBe (1 to 15).sum
         }
       }
 

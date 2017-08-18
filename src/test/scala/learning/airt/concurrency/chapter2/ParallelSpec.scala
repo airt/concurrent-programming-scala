@@ -10,7 +10,7 @@ class ParallelSpec extends FreeSpec with Matchers {
 
     "parallel" - {
       "should work correctly" in {
-        parallel(1)(2) shouldBe(1, 2)
+        parallel(1)(2) shouldBe (1, 2)
       }
     }
 

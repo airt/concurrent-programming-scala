@@ -10,9 +10,9 @@ class SpawnSpec extends FreeSpec with Matchers {
 
     "spawn" - {
       "should work correctly" in {
-        val x = Random.nextInt()
-        val y = Random.nextInt()
-        val result = Spawn.spawn {
+        val x = Random nextInt ()
+        val y = Random nextInt ()
+        val result = Spawn spawn {
           x + y
         }
         result shouldBe Success(x + y)

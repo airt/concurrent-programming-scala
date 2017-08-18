@@ -8,7 +8,7 @@ class TimedAllocatingSpec extends FreeSpec with Matchers {
 
     "TimedAllocating" - {
       "should work correctly" in {
-        noException should be thrownBy TimedAllocating.main(Array())
+        noException should be thrownBy (TimedAllocating main Array())
       }
     }
 

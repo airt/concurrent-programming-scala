@@ -10,19 +10,19 @@ class ProducerAndConsumerSpec extends FreeSpec with Matchers {
 
       "run" - {
         "should run correctly" in {
-          noException should be thrownBy ProducerAndConsumer.run()
+          noException should be thrownBy (ProducerAndConsumer run ())
         }
       }
 
       "runWithWait" - {
         "should run correctly" in {
-          noException should be thrownBy ProducerAndConsumer.runWithWait()
+          noException should be thrownBy (ProducerAndConsumer runWithWait ())
         }
       }
 
       "runWithQueue" - {
         "should run correctly" in {
-          noException should be thrownBy ProducerAndConsumer.runWithQueue()
+          noException should be thrownBy (ProducerAndConsumer runWithQueue ())
         }
       }
 

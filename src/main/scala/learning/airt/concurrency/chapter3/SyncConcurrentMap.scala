@@ -4,13 +4,13 @@ import scala.collection.generic._
 import scala.collection.mutable
 
 class SyncConcurrentMap[A, B]
-  extends mutable.HashMap[A, B]
+    extends mutable.HashMap[A, B]
     with collection.concurrent.Map[A, B]
     with mutable.MapLike[A, B, SyncConcurrentMap[A, B]] {
 
   override def putIfAbsent(k: A, v: B): Option[B] = synchronized {
     get(k) match {
-      case vo@Some(_) => vo
+      case vo @ Some(_) => vo
       case None => put(k, v)
     }
   }
@@ -24,7 +24,7 @@ class SyncConcurrentMap[A, B]
 
   override def replace(k: A, v: B): Option[B] = synchronized {
     get(k) match {
-      case vo@Some(_) => put(k, v); vo
+      case vo @ Some(_) => put(k, v); vo
       case None => None
     }
   }

@@ -13,9 +13,9 @@ class SyncConcurrentMapSpec extends FreeSpec with Matchers with Inspectors {
           val m = SyncConcurrentMap[Int, Int]()
           (1 to 100) map { i =>
             thread {
-              m.putIfAbsent(i, 1) shouldBe None
+              m putIfAbsent (i, 1) shouldBe None
             }
-          } foreach (_ join())
+          } foreach (_ join ())
           m should have size 100
           forAll(m.values)(_ shouldBe 1)
         }
@@ -23,9 +23,9 @@ class SyncConcurrentMapSpec extends FreeSpec with Matchers with Inspectors {
           val m = SyncConcurrentMap[Int, Int]((1 to 100) map ((_, 0)): _*)
           (1 to 100) map { i =>
             thread {
-              m.putIfAbsent(i, 1) shouldBe Some(0)
+              m putIfAbsent (i, 1) shouldBe Some(0)
             }
-          } foreach (_ join())
+          } foreach (_ join ())
           m should have size 100
           forAll(m.values)(_ shouldBe 0)
         }
@@ -35,27 +35,27 @@ class SyncConcurrentMapSpec extends FreeSpec with Matchers with Inspectors {
           val m = SyncConcurrentMap[Int, Int]((1 to 100) map ((_, 0)): _*)
           (1 to 100) map { i =>
             thread {
-              m.remove(i, 0) shouldBe true
+              m remove (i, 0) shouldBe true
             }
-          } foreach (_ join())
+          } foreach (_ join ())
           m should have size 0
         }
         "should not remove key value and return false when exist but not equal" in {
           val m = SyncConcurrentMap[Int, Int]((1 to 100) map ((_, 0)): _*)
           (1 to 100) map { i =>
             thread {
-              m.remove(i, 1) shouldBe false
+              m remove (i, 1) shouldBe false
             }
-          } foreach (_ join())
+          } foreach (_ join ())
           m should have size 100
         }
         "should not remove key value and return false when not exist" in {
           val m = SyncConcurrentMap[Int, Int]()
           (1 to 100) map { i =>
             thread {
-              m.remove(i, 1) shouldBe false
+              m remove (i, 1) shouldBe false
             }
-          } foreach (_ join())
+          } foreach (_ join ())
           m should have size 0
         }
       }
@@ -64,9 +64,9 @@ class SyncConcurrentMapSpec extends FreeSpec with Matchers with Inspectors {
           val m = SyncConcurrentMap[Int, Int]((1 to 100) map ((_, 0)): _*)
           (1 to 100) map { i =>
             thread {
-              m.replace(i, 1) shouldBe Some(0)
+              m replace (i, 1) shouldBe Some(0)
             }
-          } foreach (_ join())
+          } foreach (_ join ())
           m should have size 100
           forAll(m.values)(_ shouldBe 1)
         }
@@ -74,9 +74,9 @@ class SyncConcurrentMapSpec extends FreeSpec with Matchers with Inspectors {
           val m = SyncConcurrentMap[Int, Int]()
           (1 to 100) map { i =>
             thread {
-              m.replace(i, 1) shouldBe None
+              m replace (i, 1) shouldBe None
             }
-          } foreach (_ join())
+          } foreach (_ join ())
           m should have size 0
         }
       }
@@ -85,9 +85,9 @@ class SyncConcurrentMapSpec extends FreeSpec with Matchers with Inspectors {
           val m = SyncConcurrentMap[Int, Int]((1 to 100) map ((_, 0)): _*)
           (1 to 100) map { i =>
             thread {
-              m.replace(i, 0, 1) shouldBe true
+              m replace (i, 0, 1) shouldBe true
             }
-          } foreach (_ join())
+          } foreach (_ join ())
           m should have size 100
           forAll(m.values)(_ shouldBe 1)
         }
@@ -95,9 +95,9 @@ class SyncConcurrentMapSpec extends FreeSpec with Matchers with Inspectors {
           val m = SyncConcurrentMap[Int, Int]((1 to 100) map ((_, 0)): _*)
           (1 to 100) map { i =>
             thread {
-              m.replace(i, 2, 1) shouldBe false
+              m replace (i, 2, 1) shouldBe false
             }
-          } foreach (_ join())
+          } foreach (_ join ())
           m should have size 100
           forAll(m.values)(_ shouldBe 0)
         }
@@ -105,9 +105,9 @@ class SyncConcurrentMapSpec extends FreeSpec with Matchers with Inspectors {
           val m = SyncConcurrentMap[Int, Int]().empty
           (1 to 100) map { i =>
             thread {
-              m.replace(i, 2, 1) shouldBe false
+              m replace (i, 2, 1) shouldBe false
             }
-          } foreach (_ join())
+          } foreach (_ join ())
           m should have size 0
         }
       }

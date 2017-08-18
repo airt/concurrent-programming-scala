@@ -11,18 +11,18 @@ class CurlSpec extends AsyncFreeSpec with Matchers {
     "Curl" - {
       "should work correctly" in {
         noException should be thrownBy {
-          Curl.main(Array[String]("https://example.org", "--silent"))
+          Curl main Array[String]("https://example.org", "--silent")
         }
       }
       "should get response correctly" in {
-        Curl.apply("https://example.org", silent = true) map { res =>
+        Curl apply ("https://example.org", silent = true) map { res =>
           res should include("Example Domain")
         } recover {
           case _: TimeoutException => succeed
         }
       }
       "should fail with correct exception" in {
-        Curl.apply("https://localhost:65535", silent = true).failed map { e =>
+        (Curl apply ("https://localhost:65535", silent = true)).failed map { e =>
           e shouldBe a[java.net.ConnectException]
         }
       }

@@ -38,7 +38,7 @@ class ExercisesSpec extends FreeSpec with Matchers {
     "Pair" - {
       "can be used in pattern matching" in {
         Pair(1, 2) match {
-          case pair@Pair(first, second) =>
+          case pair @ Pair(first, second) =>
             pair shouldBe Pair(1, 2)
             first shouldBe 1
             second shouldBe 2
@@ -50,7 +50,7 @@ class ExercisesSpec extends FreeSpec with Matchers {
 
     "permutations" - {
       "should generate permutations" in {
-        permutations("abb") should (have length 3 and contain allOf("abb", "bab", "bba"))
+        permutations("abb") should (have length 3 and contain allOf ("abb", "bab", "bba"))
       }
     }
 

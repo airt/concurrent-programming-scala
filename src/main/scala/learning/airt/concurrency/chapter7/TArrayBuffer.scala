@@ -5,12 +5,12 @@ import scala.collection.mutable
 import scala.concurrent.stm._
 
 class TArrayBuffer[A](initialSize: Int = 8)
-  extends mutable.Buffer[A]
+    extends mutable.Buffer[A]
     with mutable.BufferLike[A, TArrayBuffer[A]]
     with GenericTraversableTemplate[A, TArrayBuffer]
     with mutable.Builder[A, TArrayBuffer[A]] {
 
-  private val arrayRef = Ref[TArray[AnyRef]](TArray ofDim[AnyRef] initialSize)
+  private val arrayRef = Ref[TArray[AnyRef]](TArray ofDim [AnyRef] initialSize)
   private val lengthRef = Ref(0)
 
   override def apply(n: Int): A = atomic { implicit txn =>
@@ -72,7 +72,7 @@ class TArrayBuffer[A](initialSize: Int = 8)
   }
 
   override def clear(): Unit = atomic { implicit txn =>
-    arrayRef() = TArray ofDim[AnyRef] initialSize
+    arrayRef() = TArray ofDim [AnyRef] initialSize
     lengthRef() = 0
   }
 
@@ -87,7 +87,7 @@ class TArrayBuffer[A](initialSize: Int = 8)
   override def sizeHint(size: Int): Unit = atomic { implicit txn =>
     if (arrayRef().length < size) {
       val oldArray = arrayRef()
-      val newArray: TArray[AnyRef] = TArray ofDim[AnyRef] size
+      val newArray: TArray[AnyRef] = TArray ofDim [AnyRef] size
       for (i <- 0 until oldArray.length) newArray(i) = oldArray(i)
       arrayRef() = newArray
     }
@@ -103,9 +103,8 @@ class TArrayBuffer[A](initialSize: Int = 8)
   }
 
   protected def withIndexChecked[B](n: Int)(action: => B)(implicit txn: InTxn): B = {
-    if (n < 0 || n >= lengthRef()) throw new IndexOutOfBoundsException(n.toString) else {
-      action
-    }
+    if (n < 0 || n >= lengthRef()) throw new IndexOutOfBoundsException(n.toString)
+    else action
   }
 
   protected def shiftLeft(index: Int, distance: Int, length: Int)(implicit txn: InTxn) {
@@ -130,11 +129,13 @@ object TArrayBuffer extends SeqFactory[TArrayBuffer] {
 
     override def hasNext: Boolean = currentIndex < buffer.length
 
-    override def next(): A = if (!hasNext) Iterator.empty.next() else {
-      val v = buffer(currentIndex)
-      currentIndex += 1
-      v
-    }
+    override def next(): A =
+      if (!hasNext) Iterator.empty next ()
+      else {
+        val v = buffer(currentIndex)
+        currentIndex += 1
+        v
+      }
 
   }
 

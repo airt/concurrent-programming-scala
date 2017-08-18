@@ -18,15 +18,19 @@ class NewThreadsObservableSpec extends FreeSpec with Matchers {
           val t = new Thread(name) {
             override def run(): Unit = Thread sleep 120
           }
-          t.start()
+          t start ()
           t
         }
 
         val rs = new ConcurrentHashMap[String, Thread].asScala
-        val ob = Observable interval 100.millis flatMap { _ => NewThreadsObservable() }
-        ob subscribe (t => rs.putIfAbsent(t.getName, t))
+        val ob = Observable interval 100.millis flatMap { _ =>
+          NewThreadsObservable()
+        }
+        ob subscribe (t => rs putIfAbsent (t.getName, t))
         Thread sleep 500
-        (1 to 10) map { i => thread(s"test-thread-$i") } foreach (_ join())
+        (1 to 10) map { i =>
+          thread(s"test-thread-$i")
+        } foreach (_ join ())
         rs.size should be >= 10
       }
     }

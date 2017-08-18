@@ -19,15 +19,15 @@ class PriorityTaskPoolSpec extends FreeSpec with Matchers {
         val lock = new AnyRef
 
         (1 to tasksQuantity) foreach { id =>
-          val priority = (math.random() * tasksQuantity).toInt
+          val priority = ((math random ()) * tasksQuantity).toInt
           (pool asynchronous priority) {
-            Thread.sleep(1)
+            Thread sleep 1
             lock synchronized (executedTasks ::= PriorityTaskRef(priority, id))
           }
         }
 
-        pool.shutdown()
-        Thread.sleep(100)
+        pool shutdown ()
+        Thread sleep 100
 
         val executedTasksPriorities =
           executedTasks filter (_.id > workersQuantity * 2) map (_.priority)

@@ -137,9 +137,10 @@ class BinomialHeapSpec extends FreeSpec with Matchers {
           def strictSize[A](tree: BinomialTree[A]): Int =
             1 + (tree.children map strictSize).sum
 
-          trees.zipWithIndex take 10 foreach { case (tree, index) =>
-            tree.order shouldBe index
-            tree.size shouldBe strictSize(tree)
+          trees.zipWithIndex take 10 foreach {
+            case (tree, index) =>
+              tree.order shouldBe index
+              tree.size shouldBe strictSize(tree)
           }
         }
       }
@@ -156,8 +157,7 @@ class BinomialHeapSpec extends FreeSpec with Matchers {
               |    x (0)
               |    x (1)
               |      x (0)
-            """.
-              stripMargin.trim
+            """.stripMargin.trim
         }
       }
 

@@ -11,11 +11,11 @@ class PureLazyCell[A](initialization: => A) {
   def apply(): A = apply(initialization)
 
   @tailrec
-  private def apply(vc: => A): A = vor.get() match {
+  private def apply(vc: => A): A = vor get () match {
     case Some(v) => v
     case None =>
       val v = vc
-      if (!vor.compareAndSet(None, Some(v))) apply(v)
+      if (!(vor compareAndSet (None, Some(v)))) apply(v)
       else v
   }
 

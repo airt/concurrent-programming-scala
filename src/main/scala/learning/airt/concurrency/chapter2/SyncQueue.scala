@@ -9,7 +9,7 @@ class SyncQueue[A](n: Int) {
   // noinspection AccessorLikeMethodIsEmptyParen
   def getWait(): A = synchronized {
     while (variables.isEmpty) wait()
-    val v = variables.dequeue()
+    val v = variables dequeue ()
     notify()
     v
   }

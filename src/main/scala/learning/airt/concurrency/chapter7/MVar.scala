@@ -23,8 +23,8 @@ object MVar {
   def apply[A](): MVar[A] = new MVar
 
   def swap[A](x: MVar[A], y: MVar[A])(implicit txn: InTxn) {
-    val xv = x take()
-    val yv = y take()
+    val xv = x take ()
+    val yv = y take ()
     x put yv
     y put xv
   }

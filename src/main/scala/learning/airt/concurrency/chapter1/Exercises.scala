@@ -16,9 +16,10 @@ object Exercises {
 
   def permutations(s: String): Seq[String] =
     if (s.length == 0) Seq("")
-    else for {
-      i <- s.map(s indexOf _).distinct
-      p <- permutations((s take i) + (s drop (i + 1)))
-    } yield s(i) +: p
+    else
+      for {
+        i <- (s map (s indexOf _)).distinct
+        p <- permutations((s take i) + (s drop (i + 1)))
+      } yield s(i) +: p
 
 }

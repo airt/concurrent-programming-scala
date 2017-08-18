@@ -17,12 +17,12 @@ class TreiberStackSpec extends FreeSpec with Matchers {
           thread {
             stack push i
           }
-        } foreach (_ join())
+        } foreach (_ join ())
         (1 to 100) map { _ =>
           thread {
-            rs put stack.pop()
+            rs put (stack pop ())
           }
-        } foreach (_ join())
+        } foreach (_ join ())
         rs.asScala.toSeq.sorted shouldEqual (1 to 100)
       }
     }

@@ -10,12 +10,14 @@ package object chapter4 {
   def delay(t: Long): Future[Unit] = {
     val promise = Promise[Unit]
     val timer = new Timer
-    timer.schedule(new TimerTask {
+    val task = new TimerTask {
       override def run() {
-        promise.success(())
-        timer.cancel()
+        // noinspection ScalaUnnecessaryParentheses
+        promise success (())
+        timer cancel ()
       }
-    }, t)
+    }
+    timer schedule (task, t)
     promise.future
   }
 

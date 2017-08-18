@@ -11,8 +11,8 @@ object Parallel {
     val threadB = thread {
       b = Some(taskB)
     }
-    threadA.join()
-    threadB.join()
+    threadA join ()
+    threadB join ()
     (a.get, b.get)
   }
 

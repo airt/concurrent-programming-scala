@@ -16,11 +16,11 @@ class ConcurrentSortedListSpec extends FreeSpec with Matchers {
           thread {
             list add i
           }
-        } foreach (_ join())
+        } foreach (_ join ())
         val rs = list.iterator.toSeq
         rs shouldEqual (1 to 100)
         a[NoSuchElementException] should be thrownBy {
-          new ConcurrentSortedList[Int].iterator.next()
+          new ConcurrentSortedList[Int].iterator next ()
         }
       }
     }

@@ -11,13 +11,13 @@ class IMap[A, B] {
   private val store = new ConcurrentHashMap[A, Promise[B]].asScala
 
   def update(k: A, v: B) {
-    store.putIfAbsent(k, Promise successful v) foreach (_ success v)
+    store putIfAbsent (k, Promise successful v) foreach (_ success v)
   }
 
   def apply(k: A): Future[B] = {
     val promise = {
       val newPromise = Promise[B]
-      store.putIfAbsent(k, newPromise) getOrElse newPromise
+      store putIfAbsent (k, newPromise) getOrElse newPromise
     }
     promise.future
   }

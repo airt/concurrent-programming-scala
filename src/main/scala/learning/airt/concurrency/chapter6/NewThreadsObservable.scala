@@ -11,24 +11,24 @@ object NewThreadsObservable {
       val previousThreads = threads
       threads = currentThreads()
       threads &~ previousThreads foreach subscriber.onNext
-      subscriber.onCompleted()
+      subscriber onCompleted ()
     }
 
   private var threads = currentThreads()
 
   private def currentThreads(): Set[Thread] = {
     val root = rootThreadGroup()
-    val activeThreads = Array.ofDim[Thread](root.activeCount)
-    root.enumerate(activeThreads, true)
+    val activeThreads: Array[Thread] = Array ofDim [Thread] root.activeCount
+    root enumerate (activeThreads, true)
     activeThreads.toSet filter (_ != null)
   }
 
   private def rootThreadGroup(): ThreadGroup =
-    rootThreadGroupOf(Thread.currentThread.getThreadGroup)
+    rootThreadGroupOf(Thread.currentThread getThreadGroup ())
 
   @tailrec
   private def rootThreadGroupOf(threadGroup: ThreadGroup): ThreadGroup =
-    Option(threadGroup.getParent) match {
+    Option(threadGroup getParent ()) match {
       case Some(parent) => rootThreadGroupOf(parent)
       case None => threadGroup
     }

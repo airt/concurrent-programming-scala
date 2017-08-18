@@ -2,7 +2,8 @@ package learning.airt.concurrency.chapter3
 
 class LazyCell[A](initialization: => A) {
 
-  @volatile private[this] var initialized = false
+  @volatile
+  private[this] var initialized = false
   private[this] var value: A = _
 
   def apply(): A = {

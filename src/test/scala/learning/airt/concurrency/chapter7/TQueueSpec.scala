@@ -19,7 +19,7 @@ class TQueueSpec extends FreeSpec with Matchers {
           val queue = TQueue[Int]()
           atomic { implicit txn =>
             queue enqueue 1
-            queue dequeue() shouldBe 1
+            queue dequeue () shouldBe 1
           }
         }
       }
@@ -29,15 +29,19 @@ class TQueueSpec extends FreeSpec with Matchers {
           val queue = TQueue[Int]()
           val step = new AtomicInteger(0)
           val ra1 = Future {
-            val v = atomic { implicit txn => queue dequeue() }
+            val v = atomic { implicit txn =>
+              queue dequeue ()
+            }
             v shouldBe 1
-            step incrementAndGet() shouldBe 2
+            step incrementAndGet () shouldBe 2
           }
           val ra2 = Future {
-            step incrementAndGet() shouldBe 1
-            atomic { implicit txn => queue enqueue 1 }
+            step incrementAndGet () shouldBe 1
+            atomic { implicit txn =>
+              queue enqueue 1
+            }
           }
-          Await ready(ra1 zip ra2, duration.Duration.Inf)
+          Await ready (ra1 zip ra2, duration.Duration.Inf)
         }
       }
 

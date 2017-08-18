@@ -3,12 +3,13 @@ package learning.airt.concurrency.chapter2
 object AccountSend {
 
   def send(sender: Account, target: Account, amount: Int) {
+
     def adjust() {
       sender.money -= amount
       target.money += amount
     }
 
-    val Seq(first, second) = Seq(sender, target).sortBy(_.id)
+    val Seq(first, second) = Seq(sender, target) sortBy (_.id)
 
     first synchronized {
       second synchronized {
@@ -18,6 +19,7 @@ object AccountSend {
   }
 
   def sendAll(senders: Set[Account], target: Account) {
+
     def adjust() {
       target.money += (0 /: senders) { (total, sender) =>
         val money = sender.money
@@ -37,17 +39,21 @@ object AccountSend {
 }
 
 object SynchronizedProtectedUid {
+
   private var uid = 0L
 
   def next(): Long = synchronized {
     uid += 1
     uid
   }
+
 }
 
 case class Account(id: Long, name: String, var money: Int)
 
 object Account {
+
   def apply(name: String, money: Int): Account =
-    apply(SynchronizedProtectedUid.next(), name, money)
+    apply(SynchronizedProtectedUid next (), name, money)
+
 }

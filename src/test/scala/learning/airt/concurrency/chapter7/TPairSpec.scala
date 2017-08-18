@@ -52,7 +52,7 @@ class TPairSpec extends FreeSpec with Matchers {
         "should work correctly" in {
           val pair = TPair(1, 2)
           atomic { implicit txn =>
-            pair.swap()
+            pair swap ()
             pair.first shouldBe 2
             pair.second shouldBe 1
           }
