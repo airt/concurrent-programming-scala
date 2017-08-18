@@ -10,6 +10,7 @@ lazy val root = (project in file(".")).
     scalacOptions ++= Seq("-deprecation"),
     libraryDependencies ++= Seq(
       "commons-io" % "commons-io" % "2.5",
+      "com.lihaoyi" %% "pprint" % "0.5.2",
       "com.jsuereth" %% "scala-arm" % "2.0",
       "io.reactivex" %% "rxscala" % "0.26.5",
       "org.scala-stm" %% "scala-stm" % "0.8",
