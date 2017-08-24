@@ -1,23 +1,20 @@
 package learning.airt.concurrency
 
-import java.util.{Timer, TimerTask}
-
 import scala.concurrent._
+import scala.concurrent.duration.Duration
 import scala.util._
 
 package object chapter4 {
 
-  def delay(t: Long): Future[Unit] = {
+  def delay(t: Duration): Future[Unit] = {
+    import java.util.{Timer, TimerTask}
     val promise = Promise[Unit]
-    val timer = new Timer
+    val timer = new Timer(true)
     val task = new TimerTask {
-      override def run() {
-        // noinspection ScalaUnnecessaryParentheses
-        promise success (())
-        timer cancel ()
-      }
+      // noinspection ScalaUnnecessaryParentheses
+      override def run(): Unit = promise success (())
     }
-    timer schedule (task, t)
+    timer schedule (task, t.toMillis)
     promise.future
   }
 
@@ -31,12 +28,11 @@ package object chapter4 {
       promise.future
     }
 
-    def withTimeout(t: Long)(implicit executor: ExecutionContext): Future[A] = {
+    def withTimeout(t: Duration)(implicit executor: ExecutionContext): Future[A] =
       delay(t) race self map {
         case Left(_) => throw new TimeoutException
         case Right(x) => x
       }
-    }
 
   }
 

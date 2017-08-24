@@ -1,14 +1,13 @@
 package learning.airt.concurrency.chapter4
 
-import java.util.{Timer, TimerTask}
-
 import resource.managed
 
 import scala.concurrent._
+import scala.concurrent.duration._
 
 object Curl {
 
-  import ExecutionContext.Implicits.global
+  import ExecutionContext.Implicits._
 
   def main(args: Array[String]) {
     apply(args(0), args contains "--silent")
@@ -18,11 +17,11 @@ object Curl {
 
     val print: Any => Unit = if (silent) _ => () else Predef.print
 
-    val dotPrinter = DotPrinter start (500, print)
+    val dotPrinter = DotPrinter start (500.millis, print)
 
     val res = Future {
       (managed(io.Source fromURL url) map (_.mkString)).opt.get
-    } withTimeout 2000
+    } withTimeout 2.seconds
 
     res onComplete (_ => dotPrinter stop ())
 
@@ -35,7 +34,9 @@ object Curl {
     res
   }
 
-  class DotPrinter(period: Long, print: Any => Unit) {
+  class DotPrinter(period: Duration, print: Any => Unit) {
+
+    import java.util.{Timer, TimerTask}
 
     private val timer = new Timer
 
@@ -43,7 +44,7 @@ object Curl {
       override def run(): Unit = print(".")
     }
 
-    timer schedule (task, 0, period)
+    timer schedule (task, 0, period.toMillis)
 
     def stop() {
       print("\n")
@@ -55,7 +56,7 @@ object Curl {
 
   object DotPrinter {
 
-    def start(period: Long, print: Any => Unit): DotPrinter = new DotPrinter(period, print)
+    def start(period: Duration, print: Any => Unit): DotPrinter = new DotPrinter(period, print)
 
   }
 
