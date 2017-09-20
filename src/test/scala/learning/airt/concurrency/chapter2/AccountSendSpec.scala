@@ -10,17 +10,18 @@ class AccountSendSpec extends FreeSpec with Matchers with Inspectors {
 
     "send" - {
       "should work correctly" in {
-        val a = Account("A", 100)
-        val b = Account("B", 100)
-        (1 to 100) foreach { _ =>
-          thread {
-            send(a, b, 10)
+        val x = Account("A", 100)
+        val y = Account("B", 100)
+        (1 to 100) flatMap { _ =>
+          val tx = thread {
+            send(x, y, 10)
           }
-          thread {
-            send(b, a, 10)
+          val ty = thread {
+            send(y, x, 10)
           }
-        }
-        forAll(Seq(a, b))(_.money shouldBe 100)
+          Seq(tx, ty)
+        } foreach (_ join ())
+        forAll(Seq(x, y))(_.money shouldBe 100)
       }
     }
 

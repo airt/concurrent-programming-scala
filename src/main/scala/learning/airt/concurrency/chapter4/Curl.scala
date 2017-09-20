@@ -4,6 +4,7 @@ import resource.managed
 
 import scala.concurrent._
 import scala.concurrent.duration._
+import scala.io.Source
 
 object Curl {
 
@@ -20,7 +21,7 @@ object Curl {
     val dotPrinter = DotPrinter start (500.millis, print)
 
     val res = Future {
-      (managed(io.Source fromURL url) map (_.mkString)).opt.get
+      (managed(Source fromURL url) map (_.mkString)).opt.get
     } withTimeout 2.seconds
 
     res onComplete (_ => dotPrinter stop ())

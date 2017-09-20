@@ -2,18 +2,18 @@ package learning.airt.concurrency.chapter2
 
 object Parallel {
 
-  def parallel[A, B](taskA: => A)(taskB: => B): (A, B) = {
-    var a: Option[A] = None
-    var b: Option[B] = None
-    val threadA = thread {
-      a = Some(taskA)
+  def parallel[A, B](taskX: => A)(taskY: => B): (A, B) = {
+    var x: Option[A] = None
+    var y: Option[B] = None
+    val tx = thread {
+      x = Some(taskX)
     }
-    val threadB = thread {
-      b = Some(taskB)
+    val ty = thread {
+      y = Some(taskY)
     }
-    threadA join ()
-    threadB join ()
-    (a.get, b.get)
+    tx join ()
+    ty join ()
+    (x.get, y.get)
   }
 
 }

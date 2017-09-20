@@ -39,8 +39,9 @@ object Spawn extends LazyLogging {
   }
 
   private def classPaths = {
+    import scala.io.Source
     val dependenciesClassPath = "target/streams/test/dependencyClasspath/$global/streams/export"
-    val dependencies = (managed(io.Source fromFile dependenciesClassPath) map (s => (s getLines ()).toList)).opt.get
+    val dependencies = (managed(Source fromFile dependenciesClassPath) map (s => (s getLines ()).toList)).opt.get
     val scv = util.Properties.versionNumberString split "\\." take 2 mkString "."
     val sources = Seq(s"target/scala-$scv/classes", s"target/scala-$scv/test-classes")
     sources ++ dependencies
