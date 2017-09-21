@@ -23,7 +23,7 @@ class CurlSpec extends AsyncFreeSpec with Matchers {
       }
       "should fail with correct exception" in {
         (Curl apply ("https://localhost:65535", silent = true)).failed map { e =>
-          e shouldBe a[java.net.ConnectException]
+          e should (be(a[java.net.ConnectException]) or be(a[TimeoutException]))
         }
       }
     }
