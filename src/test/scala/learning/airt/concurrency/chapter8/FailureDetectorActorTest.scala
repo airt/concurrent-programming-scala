@@ -8,7 +8,7 @@ import org.scalatest._
 import scala.async.Async._
 import scala.concurrent.duration._
 
-class ExecutionContextActorTest
+class FailureDetectorActorTest
     extends TestKit(ActorSystem())
     with AsyncFreeSpecLike
     with Matchers
@@ -18,23 +18,20 @@ class ExecutionContextActorTest
 
   "Exercises in Chapter 8" - {
 
-    "TimerActor" - {
+    "FailureDetectorActor" - {
       "should work correctly" in async {
-        import ExecutionContextActor._
+        import FailureDetectorActor._
         val probe = TestProbe()
         implicit val sender: ActorRef = probe.ref
-        val executor = system actorOf (ExecutionContextActor props (), "executor")
-        executor ! Execute { () =>
-          // noinspection ScalaUselessExpression
-          1 / 0
-          probe.ref ! 1
-        }
+        val child = probe childActorOf Props[EmptyActor]
+        val detector = system actorOf (FailureDetectorActor.props, "detector")
+        detector ! Detect(child, 100.millis, 100.millis)
+        await(delay(300.millis))
         probe expectNoMsg ()
-        executor ! Execute { () =>
-          probe.ref ! 2
-        }
-        probe expectMsg 2
-        await(gracefulStop(executor, 100.millis))
+        child ! PoisonPill
+        await(delay(200.millis))
+        probe expectMsg Failed(child)
+        await(gracefulStop(detector, 100.millis))
         succeed
       }
     }

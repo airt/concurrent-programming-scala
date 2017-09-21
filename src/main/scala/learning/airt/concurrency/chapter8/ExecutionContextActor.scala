@@ -1,12 +1,11 @@
 package learning.airt.concurrency.chapter8
 
 import akka.actor._
-import com.typesafe.scalalogging.LazyLogging
 
 import scala.collection.mutable
 import scala.util.control.NonFatal
 
-class ExecutionContextActor(nWorkers: Int, reportFailure: Throwable => Unit) extends Actor {
+class ExecutionContextActor(nWorkers: Int) extends Actor with ActorLogging {
 
   import ExecutionContextActor._
 
@@ -16,9 +15,11 @@ class ExecutionContextActor(nWorkers: Int, reportFailure: Throwable => Unit) ext
 
   def receive: Receive = {
     case task: Execute =>
+      log debug s"receive task $task"
       tasks enqueue task
       dispatch()
     case Finished =>
+      log debug s"$sender finished"
       runningWorkers remove sender()
       workers enqueue sender()
       dispatch()
@@ -30,29 +31,39 @@ class ExecutionContextActor(nWorkers: Int, reportFailure: Throwable => Unit) ext
       val worker = workers dequeue ()
       runningWorkers add worker
       worker ! task
+      log debug s"$worker start"
     }
+  }
+
+  override def supervisorStrategy: SupervisorStrategy = OneForOneStrategy() {
+    case NonFatal(e) =>
+      log debug s"$sender failed"
+      runningWorkers remove sender()
+      workers enqueue sender()
+      dispatch()
+      reportFailure(e)
+      SupervisorStrategy.Resume
   }
 
   override def preStart() {
     (1 to nWorkers) foreach { i =>
       workers enqueue (context actorOf (Props[WorkerActor], s"worker-$i"))
     }
+    log debug s"pre start / workers.size = ${workers.size}"
   }
 
-  override def supervisorStrategy: SupervisorStrategy = OneForOneStrategy() {
-    case NonFatal(e) =>
-      reportFailure(e)
-      SupervisorStrategy.Resume
+  override def postStop() {
+    log debug s"post stop / workers.size = ${workers.size}"
   }
+
+  protected def reportFailure(cause: Throwable): Unit = log warning s"$cause"
 
 }
 
-object ExecutionContextActor extends LazyLogging {
+object ExecutionContextActor {
 
-  def props(
-      nWorkers: Int = Runtime.getRuntime.availableProcessors,
-      reportFailure: Throwable => Unit = e => logger warn s"$e",
-  ) = Props(new ExecutionContextActor(nWorkers, reportFailure))
+  def props(nWorkers: Int = Runtime.getRuntime.availableProcessors) =
+    Props(new ExecutionContextActor(nWorkers))
 
   case class Execute(task: Runnable)
 

@@ -4,7 +4,7 @@ import java.util.concurrent.atomic.AtomicInteger
 
 import org.scalatest._
 
-class RMapSPec extends FreeSpec with Matchers {
+class RMapSpec extends FreeSpec with Matchers {
 
   "Exercises in Chapter 6" - {
 
