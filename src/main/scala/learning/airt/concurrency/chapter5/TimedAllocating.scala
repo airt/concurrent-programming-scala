@@ -21,7 +21,10 @@ object Timer {
     timed(body, runningTimes)
   }
 
-  def timed[A](body: => A, runningTimes: Int): Long = {
+  /**
+    * @return nanoseconds
+    */
+  def timed[A](body: => A, runningTimes: Int = 1): Long = {
     val start = System nanoTime ()
     run(body, runningTimes)
     val stop = System nanoTime ()
