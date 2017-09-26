@@ -1,7 +1,7 @@
 lazy val root = (project in file(".")) settings (
   inThisBuild(
     Seq(
-      organization := "learning.airt",
+      organization := "learning",
       scalaVersion := "2.12.3",
       version := "0.0.1"
     )

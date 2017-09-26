@@ -16,8 +16,8 @@ before_cache:
   - find $HOME/.sbt  -name "*.lock"               | xargs rm
 
 script:
-  - sbt ++$TRAVIS_SCALA_VERSION clean coverage test
   - sbt ++$TRAVIS_SCALA_VERSION scalafmt::test test:scalafmt::test sbt:scalafmt::test
+  - sbt ++$TRAVIS_SCALA_VERSION clean coverage test
 
 after_success:
   - sbt ++$TRAVIS_SCALA_VERSION coverageReport coveralls

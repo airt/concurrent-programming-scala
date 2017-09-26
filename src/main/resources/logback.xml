@@ -1,19 +1,22 @@
 <configuration>
 
-  <property name="APP_NAME" value="application"/>
   <property name="LOG_HOME" value="logs"/>
 
   <!-- appender -->
 
-  <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+  <appender name="SYNC_CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
     <encoder>
-      <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{20} - %msg%n</pattern>
+      <pattern>%d{HH:mm:ss.SSS} %-5level [%thread] %logger{15} - %msg%n</pattern>
     </encoder>
+  </appender>
+
+  <appender name="CONSOLE" class="ch.qos.logback.classic.AsyncAppender">
+    <appender-ref ref="SYNC_CONSOLE"/>
   </appender>
 
   <!-- logger -->
 
-  <logger name="learning.airt.concurrency" level="TRACE" additivity="false">
+  <logger name="learning.concurrent.programming" level="DEBUG" additivity="false">
     <appender-ref ref="CONSOLE"/>
   </logger>
 
