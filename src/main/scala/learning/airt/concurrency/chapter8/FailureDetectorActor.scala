@@ -2,9 +2,7 @@ package learning.airt.concurrency.chapter8
 
 import akka.actor._
 import akka.pattern._
-import akka.util.Timeout
 
-import scala.concurrent.ExecutionContext.Implicits._
 import scala.concurrent.duration._
 
 class FailureDetectorActor extends Actor {
@@ -16,9 +14,10 @@ class FailureDetectorActor extends Actor {
   }
 
   private def watch(detect: Detect)(implicit system: ActorSystem) = {
+    import system.dispatcher
     val Detect(target, interval, timeout) = detect
     (system.scheduler schedule (0.seconds, interval)) {
-      (target ? Identify(0))(Timeout(timeout)).failed foreach { _ =>
+      (target ? Identify(0))(timeout).failed foreach { _ =>
         (system actorSelection target.path.parent) ! Failed(target)
       }
     }

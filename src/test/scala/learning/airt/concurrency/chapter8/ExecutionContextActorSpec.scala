@@ -8,8 +8,9 @@ import org.scalatest._
 import scala.async.Async._
 import scala.concurrent.duration._
 
-class ExecutionContextActorTest
+class ExecutionContextActorSpec
     extends TestKit(ActorSystem())
+    with ImplicitSender
     with AsyncFreeSpecLike
     with Matchers
     with BeforeAndAfterAll {
@@ -21,19 +22,17 @@ class ExecutionContextActorTest
     "TimerActor" - {
       "should work correctly" in async {
         import ExecutionContextActor._
-        val probe = TestProbe()
-        implicit val sender: ActorRef = probe.ref
         val executor = system actorOf (ExecutionContextActor props (), "executor")
         executor ! Execute { () =>
           // noinspection ScalaUselessExpression
           1 / 0
-          probe.ref ! 1
+          testActor ! 1
         }
-        probe expectNoMsg ()
+        expectNoMsg()
         executor ! Execute { () =>
-          probe.ref ! 2
+          testActor ! 2
         }
-        probe expectMsg 2
+        expectMsg(2)
         await(gracefulStop(executor, 100.millis))
         succeed
       }

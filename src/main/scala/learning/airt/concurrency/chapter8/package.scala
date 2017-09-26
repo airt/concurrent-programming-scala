@@ -10,8 +10,10 @@ package object chapter8 {
   def delay(t: FiniteDuration)(implicit system: ActorSystem, executor: ExecutionContext): Future[Unit] = {
     val promise = Promise[Unit]
     // noinspection ScalaUnnecessaryParentheses
-    (system.scheduler scheduleOnce t) { promise success (()) }
+    (system.scheduler scheduleOnce t)(promise success (()))
     promise.future
   }
+
+  def availableProcessors: Int = Runtime.getRuntime.availableProcessors
 
 }

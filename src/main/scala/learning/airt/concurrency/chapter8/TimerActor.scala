@@ -2,7 +2,6 @@ package learning.airt.concurrency.chapter8
 
 import akka.actor._
 
-import scala.concurrent.ExecutionContext.Implicits._
 import scala.concurrent.duration._
 
 class TimerActor extends Actor {
@@ -11,6 +10,7 @@ class TimerActor extends Actor {
 
   def receive: Receive = {
     case Register(t) =>
+      import context.dispatcher
       context.system.scheduler scheduleOnce (t, sender(), Timeout)
   }
 

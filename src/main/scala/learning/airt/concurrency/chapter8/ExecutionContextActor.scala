@@ -62,8 +62,7 @@ class ExecutionContextActor(nWorkers: Int) extends Actor with ActorLogging {
 
 object ExecutionContextActor {
 
-  def props(nWorkers: Int = Runtime.getRuntime.availableProcessors) =
-    Props(new ExecutionContextActor(nWorkers))
+  def props(nWorkers: Int = availableProcessors) = Props(new ExecutionContextActor(nWorkers))
 
   case class Execute(task: Runnable)
 
