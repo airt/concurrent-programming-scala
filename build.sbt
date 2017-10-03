@@ -8,7 +8,7 @@ lazy val root = (project in file(".")) settings (
   ),
   name := "learning-concurrent-programming",
   fork := false,
-  scalacOptions ++= Seq("-feature", "-deprecation"),
+  scalacOptions ++= Seq("-feature", "-deprecation", "-unchecked"),
   libraryDependencies ++= Seq(
     "commons-io" % "commons-io" % "2.5",
     "com.lihaoyi" %% "pprint" % "0.5.3",
