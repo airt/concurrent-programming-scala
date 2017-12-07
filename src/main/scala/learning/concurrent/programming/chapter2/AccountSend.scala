@@ -30,7 +30,7 @@ object AccountSend {
 
     def synchronizedAll[R](task: () => R): List[AnyRef] => R = {
       case x :: xs => x synchronized synchronizedAll(task)(xs)
-      case _ => task()
+      case _       => task()
     }
 
     synchronizedAll(() => adjust())((target :: senders.toList) sortBy (_.id))

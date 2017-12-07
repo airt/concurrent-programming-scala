@@ -28,7 +28,7 @@ class ExecutionContextActorSpec
           1 / 0
           testActor ! 1
         }
-        expectNoMsg()
+        expectNoMessage(100.millis)
         executor ! Execute { () =>
           testActor ! 2
         }

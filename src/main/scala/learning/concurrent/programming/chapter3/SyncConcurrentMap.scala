@@ -11,28 +11,28 @@ class SyncConcurrentMap[A, B]
   override def putIfAbsent(k: A, v: B): Option[B] = synchronized {
     get(k) match {
       case vo @ Some(_) => vo
-      case None => put(k, v)
+      case None         => put(k, v)
     }
   }
 
   override def remove(k: A, ov: B): Boolean = synchronized {
     get(k) match {
       case Some(v) if v == ov => remove(k); true
-      case _ => false
+      case _                  => false
     }
   }
 
   override def replace(k: A, v: B): Option[B] = synchronized {
     get(k) match {
       case vo @ Some(_) => put(k, v); vo
-      case None => None
+      case None         => None
     }
   }
 
   override def replace(k: A, ov: B, nv: B): Boolean = synchronized {
     get(k) match {
       case Some(v) if v == ov => put(k, nv); true
-      case _ => false
+      case _                  => false
     }
   }
 

@@ -85,8 +85,8 @@ object BinomialHeap {
     def mergeTrees(ts: BinomialTrees[A])(implicit ord: Ordering[A]): BinomialTrees[A] = ts match {
       case x :: y :: rs if x.order < y.order => x :: mergeTrees(y :: rs)
       case x :: y :: rs if x.order > y.order => mergeTrees(y :: x :: rs)
-      case x :: y :: rs => mergeTrees((x merge y) :: rs)
-      case os => os
+      case x :: y :: rs                      => mergeTrees((x merge y) :: rs)
+      case os                                => os
     }
 
   }

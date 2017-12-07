@@ -8,12 +8,12 @@ class MVar[A] {
 
   def put(v: A)(implicit txn: InTxn): Unit = xr() match {
     case Some(_) => retry
-    case None => xr update Some(v)
+    case None    => xr update Some(v)
   }
 
   def take()(implicit txn: InTxn): A = xr() match {
     case Some(v) => xr update None; v
-    case None => retry
+    case None    => retry
   }
 
 }

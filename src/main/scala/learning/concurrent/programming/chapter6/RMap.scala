@@ -10,7 +10,7 @@ class RMap[A, B] {
 
   def update(k: A, v: B): Unit = internal get k match {
     case Some(ob) => ob onNext v
-    case None =>
+    case None     =>
   }
 
   def apply(k: A): Observable[B] = internal getOrElseUpdate (k, Subject())

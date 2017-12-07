@@ -30,7 +30,7 @@ package object chapter4 {
 
     def withTimeout(t: Duration)(implicit executor: ExecutionContext): Future[A] =
       delay(t) race self map {
-        case Left(_) => throw new TimeoutException
+        case Left(_)  => throw new TimeoutException
         case Right(x) => x
       }
 

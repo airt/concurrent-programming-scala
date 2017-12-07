@@ -32,7 +32,7 @@ class ConcurrentSortedList[A](implicit val ord: Ordering[A]) {
 
     override def next(): A = current match {
       case CCons(h, t) => current = t get (); h
-      case CNil => Iterator.empty next ()
+      case CNil        => Iterator.empty next ()
     }
 
   }

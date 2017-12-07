@@ -11,14 +11,14 @@ class SyncVar[A] {
   def get(): A = synchronized {
     variable match {
       case Some(v) => variable = None; v
-      case None => throw new NoSuchElementException("get from empty variable")
+      case None    => throw new NoSuchElementException("get from empty variable")
     }
   }
 
   def put(v: A): this.type = synchronized {
     variable match {
       case Some(_) => throw new IllegalStateException("put to nonempty variable")
-      case None => variable = Some(v); this
+      case None    => variable = Some(v); this
     }
   }
 

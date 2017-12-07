@@ -11,7 +11,7 @@ class TQueue[A] {
 
   def dequeue()(implicit txn: InTxn): A = qr().dequeueOption match {
     case Some((v, q)) => qr() = q; v
-    case None => retry
+    case None         => retry
   }
 
 }

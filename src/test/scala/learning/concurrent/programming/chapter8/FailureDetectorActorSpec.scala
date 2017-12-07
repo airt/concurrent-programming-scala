@@ -26,7 +26,7 @@ class FailureDetectorActorSpec
         val detector = system actorOf (FailureDetectorActor.props, "detector")
         detector ! Detect(child, 100.millis, 100.millis)
         await(delay(300.millis))
-        expectNoMsg()
+        expectNoMessage(100.millis)
         child ! PoisonPill
         await(delay(200.millis))
         expectMsg(Failed(child))

@@ -30,7 +30,7 @@ object NewThreadsObservable {
   private def rootThreadGroupOf(threadGroup: ThreadGroup): ThreadGroup =
     Option(threadGroup getParent ()) match {
       case Some(parent) => rootThreadGroupOf(parent)
-      case None => threadGroup
+      case None         => threadGroup
     }
 
 }

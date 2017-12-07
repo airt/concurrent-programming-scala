@@ -14,7 +14,7 @@ class SessionActor(password: String, target: ActorRef) extends Actor {
 
   private def processing: Receive = {
     case StopSession => context become waiting
-    case message => target forward message
+    case message     => target forward message
   }
 
 }

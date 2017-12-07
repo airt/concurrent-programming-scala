@@ -24,16 +24,16 @@ class SessionActorSpec
         import SessionActor._
         val session = system actorOf (SessionActor.props("secret", testActor), "session")
         session ! 0
-        expectNoMsg()
+        expectNoMessage(100.millis)
         session ! StartSession("secret")
         session ! 1
         expectMsg(1)
         session ! StopSession
         session ! 2
-        expectNoMsg()
+        expectNoMessage(100.millis)
         session ! StartSession("incorrect")
         session ! 3
-        expectNoMsg()
+        expectNoMessage(100.millis)
         await(gracefulStop(session, 100.millis))
         succeed
       }

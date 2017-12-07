@@ -24,7 +24,7 @@ class ParBinomialHeapSplitter[A: Ordering](heap: BinomialHeap[A])
     case tree :: Nil =>
       tree.split match {
         case Some((treeA, treeB)) => (treeA :: treeB :: Nil) map fromTree
-        case None => Nil
+        case None                 => Nil
       }
     case trees => trees map fromTree
   }
@@ -43,9 +43,9 @@ class ParBinomialHeapCombiner[A: Ordering] extends Combiner[A, ParBinomialHeap[A
   override def combine[N <: A, NewTo >: ParBinomialHeap[A]](
       other: Combiner[N, NewTo]
   ): Combiner[N, NewTo] = other match {
-    case that if that eq this => this
+    case that if that eq this             => this
     case that: ParBinomialHeapCombiner[A] => heap = heap merge that.heap; this
-    case _ => throw new IllegalArgumentException
+    case _                                => throw new IllegalArgumentException
   }
 
   override def +=(value: A): this.type = {
