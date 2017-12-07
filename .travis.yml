@@ -1,7 +1,7 @@
 language: scala
 
 scala:
-  - 2.12.3
+  - 2.12.4
 
 jdk:
   - oraclejdk8
@@ -14,6 +14,9 @@ cache:
 before_cache:
   - find $HOME/.ivy2 -name "ivydata-*.properties" | xargs rm
   - find $HOME/.sbt  -name "*.lock"               | xargs rm
+
+before_script:
+  - sbt ++$TRAVIS_SCALA_VERSION dependencyUpdates
 
 script:
   - sbt ++$TRAVIS_SCALA_VERSION scalafmt::test test:scalafmt::test sbt:scalafmt::test
