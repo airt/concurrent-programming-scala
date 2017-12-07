@@ -21,6 +21,7 @@ before_script:
 script:
   - sbt ++$TRAVIS_SCALA_VERSION scalafmt::test test:scalafmt::test sbt:scalafmt::test
   - sbt ++$TRAVIS_SCALA_VERSION clean coverage test
+  - sbt ++$TRAVIS_SCALA_VERSION bench:test
 
 after_success:
   - sbt ++$TRAVIS_SCALA_VERSION coverageReport coveralls

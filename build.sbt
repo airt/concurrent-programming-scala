@@ -1,3 +1,5 @@
+lazy val Bench = config("bench") extend Test
+
 lazy val root = (project in file(".")) settings (
   inThisBuild(
     Seq(
@@ -9,6 +11,9 @@ lazy val root = (project in file(".")) settings (
   name := "learning-concurrent-programming",
   fork := false,
   scalacOptions ++= Seq("-feature", "-deprecation", "-unchecked"),
+  testFrameworks += new TestFramework("org.scalameter.ScalaMeterFramework"),
+  parallelExecution in Bench := false,
+  logBuffered := false,
   libraryDependencies ++= Seq(
     "commons-io" % "commons-io" % "2.6",
     "com.lihaoyi" %% "pprint" % "0.5.3",
@@ -20,6 +25,7 @@ lazy val root = (project in file(".")) settings (
     "org.scala-lang.modules" %% "scala-async" % "0.9.7",
     "com.typesafe.scala-logging" %% "scala-logging" % "3.7.2",
     "org.scalatest" %% "scalatest" % "3.0.4" % Test,
-    "com.typesafe.akka" %% "akka-testkit" % "2.5.7" % Test
+    "com.typesafe.akka" %% "akka-testkit" % "2.5.7" % Test,
+    "com.storm-enroute" %% "scalameter" % "0.8.2" % Bench
   )
-)
+) configs Bench settings (inConfig(Bench)(Defaults.testSettings): _*)
